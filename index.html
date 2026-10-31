@@ -1131,7 +1131,7 @@ async function compartilharArquivo(blob,nome,tipo){
 
 /* Desenho do relatório (usado na Foto e no PDF) */
 const RW=1000,RS=2,ALT={dia:38,reg:40,total:52};
-const COLX=[{t:'Data',x:40,w:100},{t:'Hora',x:145,w:65},{t:'Fazenda',x:215,w:175},{t:'Equipamento',x:395,w:205},{t:'Observação',x:605,w:265},{t:'Litros',x:960,dir:1}];
+const COLX=[{t:'Data',x:40,w:95},{t:'Hora',x:138,w:55},{t:'Fazenda',x:196,w:110},{t:'Operador',x:310,w:120},{t:'Equipamento',x:434,w:150},{t:'Litros',x:680,dir:1},{t:'Observação',x:705,w:260}];
 function itensRel(l,imgs){
   const it=[];let dia=null,tot=0;
   const soma={};l.forEach(a=>soma[a.data]=(soma[a.data]||0)+Number(a.litros||0));
@@ -1143,9 +1143,9 @@ const MED=document.createElement('canvas').getContext('2d');
 function quebrar(c,t,w){t=String(t||'').trim();if(!t)return[];const out=[];
   for(const par of t.split(/\n/)){let lin='';for(const pal of par.split(/\s+/)){const tt=lin?lin+' '+pal:pal;
     if(c.measureText(tt).width>w&&lin){out.push(lin);lin=pal}else lin=tt}if(lin)out.push(lin)}return out}
-function obsLinhas(a){MED.font='italic 14px Arial,Helvetica,sans-serif';return quebrar(MED,a.obs,265)}
+function obsLinhas(a){MED.font='italic 14px Arial,Helvetica,sans-serif';return quebrar(MED,a.obs,260)}
 const FH=200;
-const alt=i=>i.k==='reg'?Math.max(i.a.operador?54:40,obsLinhas(i.a).length*18+16)+(i.imgs&&i.imgs.length?FH+12:0):ALT[i.k];
+const alt=i=>i.k==='reg'?Math.max(40,obsLinhas(i.a).length*18+16)+(i.imgs&&i.imgs.length?FH+12:0):ALT[i.k];
 function paginar(it,pageH){
   const pgs=[];let cur=[],h=cabAlt(true)+40;
   for(const i of it){const a=alt(i);if(pageH&&h+a>pageH-60&&cur.length){pgs.push(cur);cur=[];h=cabAlt(false)+40}cur.push(i);h+=a}
@@ -1179,17 +1179,17 @@ function desenharPagina(itens,l,primeira,pageH,pag,totPag){
   COLX.forEach(k=>{c.textAlign=k.dir?'right':'left';c.fillText(k.t.toUpperCase(),k.x,y+26)});c.textAlign='left';y+=40;
   for(const i of itens){
     if(i.k==='dia'){c.fillStyle='#e4f0f5';c.fillRect(30,y,RW-60,ALT.dia);c.fillStyle=NAVY;c.font=`bold 16px ${F}`;
-      c.fillText(nomeDia(i.d)+', '+fmtData(i.d),40,y+25);c.textAlign='right';c.fillText(fmtL(i.s)+' L',960,y+25);c.textAlign='left'}
+      c.fillText(nomeDia(i.d)+', '+fmtData(i.d),40,y+25);c.textAlign='right';c.fillText(fmtL(i.s)+' L',680,y+25);c.textAlign='left'}
     else if(i.k==='reg'){const a=i.a;c.fillStyle='#11253d';c.font=`15px ${F}`;
       c.fillText(fmtData(a.data),40,y+26);c.fillText(fmtHora(a.registradoEm),145,y+26);
-      c.fillText(cortar(c,a.fazenda,175),215,y+26);c.font=`bold 16px ${F}`;c.fillText(cortar(c,a.equipamento,205),395,y+26);if(a.operador){c.font=`13px ${F}`;c.fillStyle=CINZA;c.fillText(cortar(c,'👤 '+a.operador,205),395,y+44);c.fillStyle=NAVY}
-      c.font=`italic 14px ${F}`;c.fillStyle=CINZA;obsLinhas(a).forEach((t,k)=>c.fillText(t,605,y+26+k*18));
-      c.fillStyle=NAVY;c.font=`bold 17px ${F}`;c.textAlign='right';c.fillText(fmtL(a.litros),960,y+26);c.textAlign='left';
-      if(i.imgs&&i.imgs.length){const y0=y+Math.max(a.operador?54:40,obsLinhas(a).length*18+16);let x=215;
-        const q=i.imgs.length,lim=(RW-30-215-12*(q-1))/q;for(const im of i.imgs){let w=Math.min(360,lim,im.width*FH/im.height),h=w*im.height/im.width;if(h>FH){h=FH;w=FH*im.width/im.height}c.drawImage(im,x,y0,w,h);c.strokeStyle='#dde3ea';c.strokeRect(x,y0,w,h);x+=w+12}}
+      c.fillText(cortar(c,a.fazenda,110),196,y+26);c.fillText(cortar(c,a.operador||'—',120),310,y+26);c.font=`bold 16px ${F}`;c.fillText(cortar(c,a.equipamento,150),434,y+26);
+      c.font=`italic 14px ${F}`;c.fillStyle=CINZA;obsLinhas(a).forEach((t,k)=>c.fillText(t,705,y+26+k*18));
+      c.fillStyle=NAVY;c.font=`bold 17px ${F}`;c.textAlign='right';c.fillText(fmtL(a.litros),680,y+26);c.textAlign='left';
+      if(i.imgs&&i.imgs.length){const y0=y+Math.max(40,obsLinhas(a).length*18+16);let x=196;
+        const q=i.imgs.length,lim=(RW-30-196-12*(q-1))/q;for(const im of i.imgs){let w=Math.min(360,lim,im.width*FH/im.height),h=w*im.height/im.width;if(h>FH){h=FH;w=FH*im.width/im.height}c.drawImage(im,x,y0,w,h);c.strokeStyle='#dde3ea';c.strokeRect(x,y0,w,h);x+=w+12}}
       c.fillStyle='#dde3ea';c.fillRect(30,y+alt(i)-1,RW-60,1)}
     else{c.fillStyle=NAVY;c.fillRect(30,y+8,RW-60,ALT.total-8);c.fillStyle='#fff';c.font=`bold 19px ${F}`;
-      c.fillText(`TOTAL · ${i.n} abastecimento${i.n===1?'':'s'}`,40,y+38);c.textAlign='right';c.fillStyle='#9fd6ea';c.fillText(fmtL(i.s)+' L',960,y+38);c.textAlign='left'}
+      c.fillText(`TOTAL · ${i.n} abastecimento${i.n===1?'':'s'}`,40,y+38);c.textAlign='right';c.fillStyle='#9fd6ea';c.fillText(fmtL(i.s)+' L',680,y+38);c.textAlign='left'}
     y+=alt(i);
   }
   const ag=new Date();c.fillStyle=CINZA;c.font=`13px ${F}`;
@@ -1258,9 +1258,9 @@ function gerarXlsx(l){
   const hSer=iso=>{const d=new Date(iso);return isNaN(d)?'':(d.getHours()*60+d.getMinutes())/1440};
   const tot=l.reduce((s,a)=>s+Number(a.litros||0),0);
   // Aba 1: todos os abastecimentos
-  const r1=[[H('Data'),H('Hora'),H('Fazenda'),H('Equipamento'),H('Operador'),H('Litros'),H('Observação'),H('Fotos')]];
-  l.forEach(a=>{const h=hSer(a.registradoEm),q=qtdFotos(a);r1.push([{v:dSer(a.data),s:2},h===''?{v:''}:{v:h,s:3},{v:a.fazenda},{v:a.equipamento},{v:a.operador||''},{v:Number(a.litros)||0,s:4},{v:a.obs||''},{v:q?q+(q>1?' fotos':' foto'):''}])});
-  r1.push([T('TOTAL'),T(''),T(''),T(l.length+' abastecimentos'),T(''),{f:`SUM(F2:F${l.length+1})`,v:tot,s:5},T(''),T('')]);
+  const r1=[[H('Data'),H('Hora'),H('Fazenda'),H('Operador'),H('Equipamento'),H('Litros'),H('Observação'),H('Fotos')]];
+  l.forEach(a=>{const h=hSer(a.registradoEm),q=qtdFotos(a);r1.push([{v:dSer(a.data),s:2},h===''?{v:''}:{v:h,s:3},{v:a.fazenda},{v:a.operador||''},{v:a.equipamento},{v:Number(a.litros)||0,s:4},{v:a.obs||''},{v:q?q+(q>1?' fotos':' foto'):''}])});
+  r1.push([T('TOTAL'),T(''),T(''),T(''),T(l.length+' abastecimentos'),{f:`SUM(F2:F${l.length+1})`,v:tot,s:5},T(''),T('')]);
   // Aba 2: por equipamento (na fazenda onde abasteceu)
   const m=new Map();l.forEach(a=>{const k=a.fazendaId+'|'+(String(a.equipId).startsWith('outro:')?a.equipamento:a.equipId);if(!m.has(k))m.set(k,{f:a.fazenda,e:a.equipamento,n:0,lt:0});const o=m.get(k);o.n++;o.lt+=Number(a.litros||0)});
   const eqs=[...m.values()].sort((a,b)=>String(a.f).localeCompare(b.f)||String(a.e).localeCompare(b.e,'pt-BR',{numeric:true}));
@@ -1292,7 +1292,7 @@ function gerarXlsx(l){
 <xf numFmtId="1" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/>
 <xf numFmtId="1" fontId="2" fillId="3" borderId="0" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1"/>
 </cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`;
-  const ws=[['Abastecimentos',r1,[12,8,18,20,18,11,40,9]],['Por equipamento',r2,[18,20,15,12,11]],['Por fazenda',r3,[20,15,12]],['Por dia',r4,[12,15,12]]];
+  const ws=[['Abastecimentos',r1,[12,8,18,18,20,11,40,9]],['Por equipamento',r2,[18,20,15,12,11]],['Por fazenda',r3,[20,15,12]],['Por dia',r4,[12,15,12]]];
   const ct=ws.map((w,i)=>`<Override PartName="/xl/worksheets/sheet${i+1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join('');
   return zip([
     ['[Content_Types].xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>${ct}</Types>`],
@@ -1338,6 +1338,7 @@ function renderCad(){
   $('cadTit').textContent={eq:'Equipamentos por fazenda',op:'Operadores por fazenda',cad:'Fazendas'}[modo];
   $('cadNota').textContent={eq:'Cada equipamento fica dentro de uma fazenda. Use ⇄ para mudar de fazenda — os abastecimentos antigos continuam registrados na fazenda onde foram feitos.',op:'Cada operador fica dentro de uma fazenda e aparece no Abastecer só dessa fazenda.',cad:'Cadastre aqui as fazendas. Os equipamentos e operadores ficam nas abas próprias da Gestão.'}[modo];
   $('cadAddFaz').hidden=modo!=='cad';$('cadMov').hidden=modo!=='eq';$('cadAvanc').hidden=modo!=='cad';
+  $('cadTit').parentNode.hidden=modo==='cad';if(modo==='cad')$('cadAvanc').open=true; // Configurações: só a conexão com a nuvem
   $('cadLista').innerHTML=cad.fazendas.map(f=>{
     const eqs=eqsDaFaz(f.id),ina=cad.equipamentos.filter(e=>e.fazendaId===f.id&&e.inativo);
     if(modo==='cad')return `<div class="fzBloco"><div class="fzCab"><b>${esc(f.nome)}</b><span><button class="mini" data-rf="${f.id}">✎</button> <button class="mini" data-xf="${f.id}">🗑</button></span></div><p class="note" style="margin:0;padding:10px 14px">${eqs.length} equipamento(s) · ${(cad.operadores||[]).filter(o=>o.fazendaId===f.id&&!o.inativo).length} operador(es)</p></div>`;
@@ -1490,7 +1491,7 @@ window.addEventListener('online',carregar);
 setInterval(()=>{if(document.visibilityState==='visible')carregar()},60000);
 
 /* ---------- Início ---------- */
-const VERSAO='16';
+const VERSAO='17';
 function marcaAtualizado(d){if(d)gravar('ab_sync',d);const x=ler('ab_sync',null);const t=x?new Date(x):new Date();
   $('hoje').textContent=`Atualizado ${String(t.getDate()).padStart(2,'0')}/${String(t.getMonth()+1).padStart(2,'0')} às ${fmtHora(t.toISOString())} – v${VERSAO}`}
 marcaAtualizado();
