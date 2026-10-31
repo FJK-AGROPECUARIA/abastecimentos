@@ -169,6 +169,10 @@ input[type=date]::-webkit-date-and-time-value{text-align:center;margin:0}
 .tecAcoes1 button.tecOk{background:#1f8f4e;border-color:#1f8f4e;color:#fff;font-size:1.3rem;height:52px}
 button.camBtn{font-size:1.2rem;padding:16px}
 .enCampos{display:flex;flex-direction:column;gap:14px}
+.camLinha{display:flex;gap:8px;align-items:stretch}.camLinha .camBtn{flex:1;min-width:0}
+.galBtn{position:relative;flex:none;width:76px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;margin:0;border:2px solid var(--line);border-radius:10px;background:#fff;font-size:1.4rem;cursor:pointer;text-transform:none;letter-spacing:0;color:var(--fg)}
+.galBtn span{font-size:.72rem;font-weight:700}.galBtn input{position:absolute;inset:0;opacity:0;cursor:pointer}
+#abFotos label.fotoSlot{display:none}
 .dataBox{position:relative;display:block;flex:1;min-width:0}
 .dataBox input[type=date]{position:absolute!important;inset:0;width:100%!important;height:100%!important;opacity:0;margin:0;cursor:pointer;z-index:1}
 .dataTxt{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:46px;font-size:16px;font-variant-numeric:tabular-nums;color:var(--fg);background:var(--bg);border:2px solid var(--line);border-radius:10px;padding:10px 8px;font-weight:600}
@@ -268,7 +272,7 @@ button.cancelarBtn{background:var(--bad);border-color:var(--bad);color:#fff;font
       </div>
       <div class="passo" id="abLtBox" hidden>
         <label style="margin-top:2px">Fotos do marcador da bomba <span class="note" style="text-transform:none;letter-spacing:0;font-weight:500">· até 4 · funciona sem internet</span></label>
-        <button class="lima camBtn" id="abCam">📷 Tirar fotos da bomba</button>
+        <div class="camLinha"><button class="lima camBtn" id="abCam">📷 Tirar fotos</button><label class="galBtn">🖼<span>Galeria</span><input type="file" accept="image/*" multiple id="abGal"></label></div>
         <div class="fotos" id="abFotos"></div>
         <div class="leitura" id="abLeit" hidden></div>
         <label for="abLitros" style="margin-top:6px">Litros abastecidos</label>
@@ -557,7 +561,7 @@ function renderAbast(){
   $('abLtBox').hidden=!form.eq;$('abCancelar').hidden=!form.faz;
   $('abEstoque').hidden=!form.faz;if(form.faz){const sd=saldoFaz(form.faz);$('abEstoque').innerHTML=`<small>Estoque atual</small><b class="${sd<0?'neg':''}">${fmtL(sd)} L</b>`}
   if(form.eq){slotsFotos($('abFotos'),form.fotos,renderAbast);
-    const n=form.fotos.filter(Boolean).length;$('abCam').textContent=n?(n<MAXF?`📷 Tirar mais fotos (${n} de ${MAXF})`:'📷 Tirar as fotos de novo'):'📷 Tirar fotos da bomba'}
+    const n=form.fotos.filter(Boolean).length;$('abCam').textContent=n?(n<MAXF?`📷 Mais fotos (${n}/${MAXF})`:'📷 Tirar de novo'):'📷 Tirar fotos'}
   renderPend();
 }
 $('abData').onchange=e=>{form.data=e.target.value||chaveDia();renderAbast()};
@@ -674,6 +678,12 @@ function litrosDoTexto(t){
   return null;
 }
 $('abLitros').addEventListener('input',()=>{$('abLitros').dataset.auto=''});
+// Galeria: escolhe uma ou várias fotos já tiradas (até completar 4)
+$('abGal').onchange=async e=>{const fs=[...e.target.files];e.target.value='';if(!fs.length)return;
+  let livres=form.fotos.filter(x=>!x).length;if(!livres){toast('Já tem 4 fotos. Tire uma para trocar.');return}
+  for(const f of fs.slice(0,livres)){try{const n=form.fotos.findIndex(x=>!x);form.fotos[n]=await novaFoto(f)}catch(x){toast('Não deu para usar uma das fotos')}}
+  if(fs.length>livres)toast(`Só cabem ${MAXF} fotos`);
+  renderAbast();lerLitrosBomba()};
 /* ---------- Janela (editar / senha / confirmar) ---------- */
 function janela(html,montar,cls){
   const f=document.createElement('div');f.className='fundo';f.innerHTML=`<div class="janela ${cls||''}">${html}</div>`;
@@ -1324,7 +1334,7 @@ window.addEventListener('online',carregar);
 setInterval(()=>{if(document.visibilityState==='visible')carregar()},60000);
 
 /* ---------- Início ---------- */
-const VERSAO='9';
+const VERSAO='10';
 function marcaAtualizado(d){if(d)gravar('ab_sync',d);const x=ler('ab_sync',null);const t=x?new Date(x):new Date();
   $('hoje').textContent=`Atualizado ${String(t.getDate()).padStart(2,'0')}/${String(t.getMonth()+1).padStart(2,'0')} às ${fmtHora(t.toISOString())} – v${VERSAO}`}
 marcaAtualizado();
