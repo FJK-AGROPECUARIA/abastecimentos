@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" content="#0c465f">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icone-192.png">
 <link rel="apple-touch-icon" href="icone-192.png">
@@ -23,7 +23,7 @@ html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset
 html,body{touch-action:manipulation;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.4}
 .wrap{max-width:640px;margin:0 auto;padding-block:16px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:18px}
-.topo{background:linear-gradient(135deg,#1f4f25 0%,#2f6b2c 100%);color:#fff;padding:14px max(12px,env(safe-area-inset-right,0px)) 14px max(12px,env(safe-area-inset-left,0px));border-radius:0 0 20px 20px}
+.topo{background:linear-gradient(135deg,#0c465f 0%,#19698a 100%);color:#fff;padding:14px max(12px,env(safe-area-inset-right,0px)) 14px max(12px,env(safe-area-inset-left,0px));border-radius:0 0 20px 20px}
 .topoLinha{display:flex;align-items:center;gap:8px;min-height:66px}
 body.naInicio .topoLinha{min-height:clamp(80px,24vw,130px)}
 .topo img.topoLogo{height:clamp(52px,15.5vw,80px);width:auto;flex:none;display:block;margin:0}
@@ -167,6 +167,41 @@ input[type=date]::-webkit-date-and-time-value{text-align:center;margin:0}
 .teclado button:active{background:var(--lima-claro)}
 .tecAcoes1{display:grid;width:276px;max-width:100%;margin:6px auto 0}
 .tecAcoes1 button.tecOk{background:#1f8f4e;border-color:#1f8f4e;color:#fff;font-size:1.3rem;height:52px}
+button.camBtn{font-size:1.2rem;padding:16px}
+.enCampos{display:flex;flex-direction:column;gap:14px}
+ #abFotos{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+#abFotos .fotoSlot{aspect-ratio:1;border-radius:10px}
+#abFotos label.fotoSlot{font-size:.62rem;gap:0;line-height:1.1;text-align:center}#abFotos label.fotoSlot span{font-size:1.2rem}
+#abFotos .fotoSlot .tirar{width:24px;height:24px;font-size:.7rem;top:3px;right:3px}
+.estAtual{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--chip);border:2px solid var(--lima);border-radius:12px;padding:10px 14px}
+.estAtual small{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.estAtual b{white-space:nowrap;flex:none;font-family:var(--display);font-stretch:condensed;font-size:2rem;line-height:1;color:var(--ok)}.estAtual b.neg{color:var(--bad)}
+.gTiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding-top:10px}
+.gTiles button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:140px;padding:14px 8px;border-radius:18px;border:0;background:var(--c);color:#fff;font-size:1.3rem;font-weight:800;box-shadow:0 2px 6px rgba(0,0,0,.12)}
+.gTiles .gIc{font-size:2.6rem;line-height:1}
+.eqTopo{display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px}.eqTopo label{margin:0}.eqTopo button{font-size:.8rem;padding:4px 8px}
+.eqMarcar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.eqChk{display:flex;align-items:center;gap:8px;margin:0;padding:9px 10px;border:2px solid var(--line);border-radius:10px;background:#fff;text-transform:none;letter-spacing:0;font-size:.95rem;color:var(--muted);cursor:pointer;min-width:0}
+.eqChk.on{border-color:var(--accent);background:var(--chip);color:var(--fg);font-weight:700}
+.eqChk input{width:20px;height:20px;flex:none;accent-color:var(--accent);margin:0}
+.eqChk span{min-width:0;overflow:hidden;text-overflow:ellipsis}.eqChk small{display:block;font-size:.72rem;font-weight:500;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat small{white-space:normal!important;overflow:visible!important;font-size:.62rem!important;letter-spacing:.02em!important;line-height:1.2}
+button.inativar{border-color:var(--warn);color:var(--warn)}
+.eqLinha.inativo{background:#f4f5f6}.eqLinha.inativo>span{color:var(--muted)}
+details.avancado summary{cursor:pointer;list-style:none}details.avancado summary::-webkit-details-marker{display:none}details.avancado summary h2{border-left:5px solid var(--lima);padding-left:8px}details.avancado:not([open]){gap:0}
+button.cancelarBtn{background:var(--bad);border-color:var(--bad);color:#fff;font-size:1.1rem;padding:14px}
+.janela.alerta{border-top-color:var(--bad);background:#fff5f4}
+.janela.alerta h3{color:var(--bad)}
+/* nomes das fazendas em maiúsculo em todos os filtros */
+.escolha:not(.eq) button,#hFaz button,#eF button,#xF button,#jF button,.estTopo b,.fzCab b{text-transform:uppercase}
+.escolha button small{text-transform:none}
+.cam{position:fixed;inset:0;z-index:40;background:#000;display:flex;flex-direction:column}
+.cam video{flex:1;min-height:0;width:100%;object-fit:cover;background:#000}
+.camTopo{position:absolute;top:0;left:0;right:0;padding:calc(10px + env(safe-area-inset-top,0px)) 14px 10px;color:#fff;font-weight:700;font-size:1.1rem;text-align:center;background:linear-gradient(rgba(0,0,0,.6),transparent)}
+.camBase{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 18px calc(18px + env(safe-area-inset-bottom,0px));background:#000}
+.camBase button{min-width:92px;background:#222;color:#fff;border-color:#444}
+.camDisparo{width:76px!important;min-width:76px!important;height:76px;border-radius:50%!important;background:#fff!important;border:6px solid #9a9a9a!important;padding:0}
+.camMinis{display:flex;gap:6px;justify-content:center;padding:0 0 8px;background:#000}.camMinis img{width:56px;height:42px;object-fit:cover;border-radius:6px;border:2px solid #fff}
 /* Cadastros */
 .cadeado{display:flex;flex-direction:column;gap:12px;align-items:stretch;text-align:center}
 .cadeado input{text-align:center;letter-spacing:.5em;font-size:2rem;font-weight:700}
@@ -195,10 +230,17 @@ input[type=date]::-webkit-date-and-time-value{text-align:center;margin:0}
   <!-- MENU PRINCIPAL -->
   <div class="inicio" id="inicio">
     <button class="grande gAbast" data-ir="abast">⛽ Abastecer</button>
-    <button class="grande gEnt" data-ir="ent">🚚 Entradas</button>
-    <button class="grande gEst" data-ir="est">🛢️ Estoque</button>
-    <button class="grande gHist" data-ir="hist">📖 Histórico</button>
-    <button class="grande gCad" data-ir="cad">⚙️ Configurações</button>
+    <button class="grande gCad" data-ir="gest">📊 Gestão</button>
+  </div>
+
+  <!-- GESTÃO (senha 0000) -->
+  <div id="tGest" hidden>
+    <div class="gTiles">
+      <button data-ir="ent" style="--c:#5f6b73"><span class="gIc">🚚</span>Entradas</button>
+      <button data-ir="est" style="--c:#2c4f7c"><span class="gIc">🛢️</span>Estoque</button>
+      <button data-ir="hist" style="--c:#3d84c6"><span class="gIc">📖</span>Histórico</button>
+      <button data-ir="cad" style="--c:#11253d"><span class="gIc">⚙️</span>Configurações</button>
+    </div>
   </div>
 
   <!-- ABASTECER -->
@@ -213,20 +255,23 @@ input[type=date]::-webkit-date-and-time-value{text-align:center;margin:0}
         <label>Fazenda</label>
         <div class="escolha" id="abFaz"></div>
       </div>
+      <div class="estAtual" id="abEstoque" hidden></div>
       <div class="passo" id="abEqBox" hidden>
         <label>Equipamento</label>
         <div class="escolha eq" id="abEq"></div>
       </div>
       <div class="passo" id="abLtBox" hidden>
-        <div class="resumoSel" id="abResumo"></div>
-        <label for="abLitros">Litros abastecidos</label>
+        <label style="margin-top:2px">Fotos do marcador da bomba <span class="note" style="text-transform:none;letter-spacing:0;font-weight:500">· até 4 · funciona sem internet</span></label>
+        <button class="lima camBtn" id="abCam">📷 Tirar fotos da bomba</button>
+        <div class="fotos" id="abFotos"></div>
+        <div class="leitura" id="abLeit" hidden></div>
+        <label for="abLitros" style="margin-top:6px">Litros abastecidos</label>
         <input type="text" class="big" id="abLitros" inputmode="numeric" pattern="[0-9]*" placeholder="0" autocomplete="off">
         <label for="abObs" style="margin-top:6px">Observação</label>
         <textarea id="abObs" placeholder="Opcional (ex.: horímetro, quem abasteceu…)"></textarea>
-        <label style="margin-top:6px">Fotos (até 2) <span class="note" style="text-transform:none;letter-spacing:0;font-weight:500">· funciona sem internet</span></label>
-        <div class="fotos" id="abFotos"></div>
         <button class="verde" id="abRegistrar">✓ Registrar abastecimento</button>
       </div>
+      <button class="cancelarBtn" id="abCancelar" hidden>✕ Cancelar abastecimento</button>
     </section>
 
     <details class="panel pend" id="pendBox" open hidden>
@@ -241,9 +286,10 @@ input[type=date]::-webkit-date-and-time-value{text-align:center;margin:0}
     <section class="panel">
       <h2>Entrada de combustível</h2>
       <div class="passo"><label>Fazenda <span class="obrig">*</span></label><div class="escolha" id="enFaz"></div></div>
+      <div id="enCampos" class="enCampos" hidden>
       <div class="passo"><label>Nota fiscal</label>
-        <div class="row"><label class="filebtn lima">📷 Foto da nota<input type="file" accept="image/*" id="enFoto"></label><label class="filebtn">📄 PDF da nota<input type="file" accept="application/pdf,.pdf,.xml,text/xml" id="enXml"></label></div>
-        <p class="note">A nota preenche os campos sozinha. Confira e escolha a fazenda.</p>
+        <div class="row"><label class="filebtn">📷 Foto - NF<input type="file" accept="image/*" id="enFoto"></label><label class="filebtn">📄 PDF - NF<input type="file" accept="application/pdf,.pdf,.xml,text/xml" id="enXml"></label></div>
+        <p class="note">A nota preenche os campos sozinha. Confira antes de lançar.</p>
         <div class="leitura" id="enLeitura" hidden></div>
         <div class="row" style="align-items:center"><div class="minis" id="enMini"></div><button class="mini danger" id="enTirarFoto" style="flex:0 0 auto" hidden>✕ Tirar anexo</button></div>
       </div>
@@ -257,6 +303,8 @@ input[type=date]::-webkit-date-and-time-value{text-align:center;margin:0}
       </div>
       <div><label for="enObs">Observação</label><textarea id="enObs" placeholder="Opcional"></textarea></div>
       <button class="verde" id="enLancar">✓ Lançar entrada</button>
+      <button class="cancelarBtn" id="enCancelar">✕ Cancelar entrada</button>
+      </div>
     </section>
     <details class="panel pend" id="enRecBox" open hidden>
       <summary><h2>Entradas recentes <span id="enRecQtd"></span></h2><span class="seta">▾</span></summary>
@@ -292,7 +340,7 @@ input[type=date]::-webkit-date-and-time-value{text-align:center;margin:0}
         <div><label for="hAte">Até</label><input type="date" id="hAte"></div>
       </div>
       <div><label>Fazenda</label><div class="chips" id="hFaz"></div></div>
-      <div><label for="hEq">Equipamento</label><select id="hEq"></select></div>
+      <div><div class="eqTopo"><label>Equipamentos</label><span><button class="mini" id="hEqTodos">✓ Marcar todos</button> <button class="mini" id="hEqNenhum">Desmarcar todos</button></span></div><div class="eqMarcar" id="hEq"></div></div>
     </section>
     <section class="panel">
       <div class="stat">
@@ -326,12 +374,13 @@ input[type=date]::-webkit-date-and-time-value{text-align:center;margin:0}
         <h2>Mudanças de fazenda</h2>
         <div id="movLista"></div>
       </section>
-      <section class="panel">
-        <h2>Nuvem</h2>
+      <details class="panel avancado">
+        <summary><h2>Avançado · conexão com a nuvem</h2></summary>
+        <p class="note">Endereço da planilha no Google onde ficam salvos todos os lançamentos. Já vem configurado — não precisa mexer.</p>
         <label for="apiUrl">Link do Google Script</label>
         <input type="text" id="apiUrl" inputmode="url" autocomplete="off" placeholder="https://script.google.com/macros/s/…/exec">
         <button id="salvarApi">Salvar link</button>
-      </section>
+      </details>
     </div>
   </div>
 </div>
@@ -418,8 +467,9 @@ async function fotoURL(sl){if(!sl)return null;if(cacheURL[sl.k])return cacheURL[
 const qtdFotos=a=>(a.fotos||[]).filter(Boolean).length;
 // desenha os 2 espaços de foto (formulário e edição)
 function slotsFotos(el,lista,mudou){
-  el.innerHTML=[0,1].map(n=>lista[n]?`<div class="fotoSlot" data-n="${n}"><img alt="Foto ${n+1}"><button class="tirar" data-x="${n}" aria-label="Tirar foto ${n+1}">✕</button></div>`
-    :`<label class="fotoSlot"><span>📷</span>Foto ${n+1}<input type="file" accept="image/*" data-in="${n}"></label>`).join('');
+  const vazio=lista.findIndex(x=>!x);const idx=lista.map((x,i)=>i).filter(i=>lista[i]||i===vazio);
+  el.innerHTML=idx.map(n=>lista[n]?`<div class="fotoSlot" data-n="${n}"><img alt="Foto ${n+1}"><button class="tirar" data-x="${n}" aria-label="Tirar foto ${n+1}">✕</button></div>`
+    :`<label class="fotoSlot"><span>🖼</span>Da galeria<input type="file" accept="image/*" data-in="${n}"></label>`).join('');
   el.querySelectorAll('.fotoSlot[data-n]').forEach(d=>fotoURL(lista[+d.dataset.n]).then(u=>{if(u)d.querySelector('img').src=u}));
   el.querySelectorAll('[data-in]').forEach(i=>i.onchange=async()=>{const f=i.files[0];if(!f)return;
     try{lista[+i.dataset.in]=await novaFoto(f);mudou()}catch(e){toast('Não deu para usar esta foto')}});
@@ -427,24 +477,35 @@ function slotsFotos(el,lista,mudou){
 }
 // coloca na fila as fotos que mudaram
 function filaFotos(id,antes,depois,tab){
-  for(let n=0;n<2;n++){const a=antes&&antes[n],d=depois&&depois[n];
+  for(let n=0;n<Math.max((antes||[]).length,(depois||[]).length);n++){const a=antes&&antes[n],d=depois&&depois[n];
     if((a&&a.k)!==(d&&d.k))fila.push({acao:'foto',dados:{id,n,k:d?d.k:null,tab:tab||'abs'}})}
 }
 
 /* ---------- Navegação ---------- */
 let tela='inicio',cadLiberado=false;
-const TITULOS={inicio:'Abastecimentos',abast:'Abastecer',ent:'Entradas',est:'Estoque',hist:'Histórico',cad:'Configurações'};
+const TITULOS={inicio:'Abastecimentos',gest:'Gestão',abast:'Abastecer',ent:'Entradas',est:'Estoque',hist:'Histórico',cad:'Configurações'};
 function ir(t){
   tela=t;document.body.classList.toggle('naInicio',t==='inicio');
-  $('tAbast').hidden=t!=='abast';$('tEnt').hidden=t!=='ent';$('tEst').hidden=t!=='est';$('tHist').hidden=t!=='hist';$('tCad').hidden=t!=='cad';
+  $('tAbast').hidden=t!=='abast';$('tGest').hidden=t!=='gest';$('tEnt').hidden=t!=='ent';$('tEst').hidden=t!=='est';$('tHist').hidden=t!=='hist';$('tCad').hidden=t!=='cad';
   $('titulo').textContent=TITULOS[t];
-  if(t==='inicio')cadLiberado=false;
+  if(t==='inicio')cadLiberado=false;else limparTela(t);
   render();window.scrollTo(0,0);
 }
-const TIT_SENHA={ent:'Senha das Entradas',est:'Senha do Estoque',hist:'Senha do Histórico',cad:'Senha das Configurações'};
+/* toda vez que entra numa tela ela abre limpa (os registros recentes continuam) */
+function limparTela(t){
+  document.querySelectorAll('.fundo').forEach(x=>x.remove());
+  if(t==='abast'){form.data=chaveDia();form.faz=null;form.eq=null;form.fotos=[null,null,null,null];$('abLitros').value='';$('abLitros').dataset.auto='';$('abObs').value='';$('abLeit').hidden=true}
+  if(t==='ent'){fe.faz=null;fe.fotos=[null,null];['enForn','enNF','enLitros','enTotal','enVL','enObs'].forEach(i=>$(i).value='');$('enData').value=chaveDia();$('enLeitura').hidden=true}
+  if(t==='hist'){aplicaPeriodo('7');filtro.faz='';filtro.off=new Set();$('hComFotos').checked=false}
+  if(t==='est'){fest.faz='';fest.per='30'}
+}
+/* Abastecer: sem senha. Gestão: senha 0000; dentro dela Entradas, Estoque, Histórico e Configurações */
+const DA_GESTAO=['ent','est','hist','cad'];
 document.querySelectorAll('[data-ir]').forEach(b=>b.onclick=async()=>{const t=b.dataset.ir;
   if(t==='abast'){ir(t);return}
-  if(await pedirSenhaTec(TIT_SENHA[t]||'Senha')){if(t==='cad')cadLiberado=true;ir(t)}});
+  if(t==='gest'){if(await pedirSenhaTec('Senha da Gestão')){cadLiberado=true;ir('gest')}return}
+  if(DA_GESTAO.includes(t)&&cadLiberado){ir(t);return}
+  if(await pedirSenhaTec('Senha da Gestão')){cadLiberado=true;ir(t)}});
 /* Teclado de senha: abre ao tocar no menu; com 4 dígitos certos já entra */
 let senhaDig='',senhaRes=null;
 function mostrarSenha(){$('senhaValor').textContent='●'.repeat(senhaDig.length)+'○'.repeat(Math.max(0,SENHA.length-senhaDig.length))}
@@ -462,7 +523,7 @@ $('tecSenha').addEventListener('click',e=>{const b=e.target.closest('button[data
 document.addEventListener('keydown',e=>{if($('tecSenha').hidden||e.ctrlKey||e.metaKey||e.altKey)return;
   const k=/^[0-9]$/.test(e.key)?e.key:e.key==='Backspace'?'del':e.key==='Enter'?'ok':e.key==='Escape'?'cancelar':null;if(!k)return;
   e.preventDefault();const b=$('tecSenha').querySelector(`button[data-s="${k}"]`);if(b)b.click()});
-$('btnVoltar').onclick=()=>ir('inicio');
+$('btnVoltar').onclick=()=>ir(DA_GESTAO.includes(tela)?'gest':'inicio');
 function render(){
   if(tela==='abast')renderAbast();
   if(tela==='hist')renderHist();
@@ -473,12 +534,13 @@ function render(){
 }
 
 /* ---------- Abastecer ---------- */
-const form={data:chaveDia(),faz:null,eq:null,fotos:[null,null]};
+const MAXF=4; // fotos no abastecimento
+const form={data:chaveDia(),faz:null,eq:null,fotos:[null,null,null,null]};
 function renderAbast(){
   $('abData').value=form.data;
   const outra=form.data!==chaveDia();
   $('abDataLinha').classList.toggle('outra',outra);$('abHoje').hidden=!outra;
-  $('abFaz').innerHTML=cad.fazendas.map(f=>`<button data-f="${f.id}" class="${form.faz===f.id?'sel':''}">${esc(f.nome)}<small>${eqsDaFaz(f.id).length} equip.</small></button>`).join('')||'<div class="vazio" style="grid-column:1/-1">Nenhuma fazenda cadastrada. Entre em ⚙️ Configurações.</div>';
+  $('abFaz').innerHTML=cad.fazendas.map(f=>`<button data-f="${f.id}" class="${form.faz===f.id?'sel':''}">${esc(f.nome)}</button>`).join('')||'<div class="vazio" style="grid-column:1/-1">Nenhuma fazenda cadastrada. Entre em ⚙️ Configurações.</div>';
   $('abFaz').querySelectorAll('button').forEach(b=>b.onclick=()=>{form.faz=b.dataset.f;form.eq=null;renderAbast()});
   $('abEqBox').hidden=!form.faz;
   if(form.faz){
@@ -486,8 +548,10 @@ function renderAbast(){
     $('abEq').innerHTML=lista.map(e=>`<button data-e="${e.id}" class="${form.eq===e.id?'sel':''}">${esc(e.nome)}</button>`).join('')||'<div class="vazio" style="grid-column:1/-1">Nenhum equipamento nesta fazenda. Cadastre em ⚙️ Configurações.</div>';
     $('abEq').querySelectorAll('button').forEach(b=>b.onclick=()=>{form.eq=b.dataset.e;renderAbast();setTimeout(()=>$('abLtBox').scrollIntoView({behavior:'smooth',block:'start'}),50)});
   }
-  $('abLtBox').hidden=!form.eq;
-  if(form.eq){$('abResumo').textContent=`${eqPorId(form.eq).nome} · ${fazPorId(form.faz).nome} · ${fmtData(form.data)} · estoque ${fmtL(saldoFaz(form.faz))} L`;slotsFotos($('abFotos'),form.fotos,renderAbast)}
+  $('abLtBox').hidden=!form.eq;$('abCancelar').hidden=!form.faz;
+  $('abEstoque').hidden=!form.faz;if(form.faz){const sd=saldoFaz(form.faz);$('abEstoque').innerHTML=`<small>Estoque atual</small><b class="${sd<0?'neg':''}">${fmtL(sd)} L</b>`}
+  if(form.eq){slotsFotos($('abFotos'),form.fotos,renderAbast);
+    const n=form.fotos.filter(Boolean).length;$('abCam').textContent=n?(n<MAXF?`📷 Tirar mais fotos (${n} de ${MAXF})`:'📷 Tirar as fotos de novo'):'📷 Tirar fotos da bomba'}
   renderPend();
 }
 $('abData').onchange=e=>{form.data=e.target.value||chaveDia();renderAbast()};
@@ -497,11 +561,11 @@ $('abRegistrar').onclick=()=>{
   const lt=parseInt(String($('abLitros').value).replace(/\D/g,''),10);
   if(!(lt>0)){toast('Informe os litros');$('abLitros').focus();return}
   const f=fazPorId(form.faz),e=eqPorId(form.eq);
-  const rec={id:uid(),data:form.data,fazendaId:f.id,fazenda:f.nome,equipId:e.id,equipamento:e.nome,litros:lt,obs:$('abObs').value.trim(),registradoEm:new Date().toISOString(),aparelho:disp,fotos:[null,null]};
+  const rec={id:uid(),data:form.data,fazendaId:f.id,fazenda:f.nome,equipId:e.id,equipamento:e.nome,litros:lt,obs:$('abObs').value.trim(),registradoEm:new Date().toISOString(),aparelho:disp,fotos:[null,null,null,null]};
   const fts=form.fotos.slice();rec.fotos=fts.map(f=>f?{k:f.k,arq:null}:null);
-  abs.push(rec);gravar(K.abs,abs);fila.push({acao:'abastecer',dados:{...rec,fotos:[null,null]}});filaFotos(rec.id,[null,null],rec.fotos);gravar(K.fila,fila);enviarFila(); // vai direto para o histórico
+  abs.push(rec);gravar(K.abs,abs);fila.push({acao:'abastecer',dados:{...rec,fotos:[]}});filaFotos(rec.id,[],rec.fotos);gravar(K.fila,fila);enviarFila(); // vai direto para o histórico
   pend.unshift({id:rec.id,registradoEm:rec.registradoEm});gravar(K.pend,pend);
-  $('abLitros').value='';$('abObs').value='';form.eq=null;form.fotos=[null,null];
+  $('abLitros').value='';$('abLitros').dataset.auto='';$('abObs').value='';$('abLeit').hidden=true;form.eq=null;form.fotos=[null,null,null,null];
   $('pendBox').open=true;renderAbast();toast('Registrado! Pode editar por 5 min em Abastecimentos recentes');
   setTimeout(()=>$('pendBox').scrollIntoView({behavior:'smooth'}),80);
 };
@@ -540,9 +604,73 @@ setInterval(()=>{
   if(mudou){gravar(K.pend,pend);if(tela==='abast')renderAbast()}
 },1000);
 
+/* Cancelar (sem senha): aviso vermelho, apaga o que foi preenchido e volta ao menu */
+function avisoCancelar(txt,ok){janela(`<h3>⚠️ ${esc(txt)}</h3><p class="note" style="color:var(--bad)">O que foi preenchido será apagado e nada será lançado.</p><div class="row"><button id="jNao">Não, continuar</button><button class="primary" id="jSim" style="background:var(--bad);border-color:var(--bad)">Sim, cancelar</button></div>`,(j,fechar)=>{j.querySelector('#jNao').onclick=fechar;j.querySelector('#jSim').onclick=()=>{fechar();ok()}},'alerta')}
+$('abCancelar').onclick=()=>avisoCancelar('Deseja realmente cancelar este abastecimento?',()=>{limparTela('abast');ir('inicio');toast('Abastecimento cancelado')});
+$('enCancelar').onclick=()=>avisoCancelar('Deseja realmente cancelar esta entrada?',()=>{limparTela('ent');ir('gest');toast('Entrada cancelada')});
+/* ---------- Câmera: tira as fotos em sequência (até 2) ---------- */
+let camStream=null;
+function camera(max,titulo){return new Promise(async res=>{
+  const fotos=[];
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){res(null);return}
+  try{camStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}},audio:false})}catch(e){res(null);return}
+  const el=document.createElement('div');el.className='cam';
+  el.innerHTML=`<video playsinline autoplay muted></video><div class="camTopo"></div><div class="camMinis"></div><div class="camBase"><button data-c="canc">Cancelar</button><button class="camDisparo" data-c="tirar" aria-label="Tirar foto"></button><button data-c="ok">Pronto</button></div>`;
+  document.body.appendChild(el);const v=el.querySelector('video');v.srcObject=camStream;
+  const topo=()=>{el.querySelector('.camTopo').textContent=`${titulo||'Foto'} ${Math.min(fotos.length+1,max)} de ${max}`};topo();
+  const fim=ok=>{camStream&&camStream.getTracks().forEach(t=>t.stop());camStream=null;el.remove();res(ok?fotos:[])};
+  el.addEventListener('click',async e=>{const b=e.target.closest('button[data-c]');if(!b)return;const c=b.dataset.c;
+    if(c==='canc'){fim(false);return}
+    if(c==='ok'){fim(true);return}
+    if(!v.videoWidth)return;
+    const m=1280,k=Math.min(1,m/Math.max(v.videoWidth,v.videoHeight)),cv=document.createElement('canvas');cv.width=Math.round(v.videoWidth*k);cv.height=Math.round(v.videoHeight*k);
+    cv.getContext('2d').drawImage(v,0,0,cv.width,cv.height);
+    const blob=await new Promise(r=>cv.toBlob(r,'image/jpeg',0.75));fotos.push(blob);
+    const im=new Image();im.src=URL.createObjectURL(blob);el.querySelector('.camMinis').appendChild(im);
+    el.style.opacity='.4';setTimeout(()=>el.style.opacity='',120);
+    if(fotos.length>=max)setTimeout(()=>fim(true),250);else topo()});
+})}
+$('abCam').onclick=async()=>{
+  let tem=form.fotos.filter(Boolean).length;if(tem>=MAXF){form.fotos=[null,null,null,null];tem=0}const max=MAXF-tem;
+  const fs=await camera(max,'Marcador da bomba ·');
+  if(fs===null){ // sem câmera ao vivo: abre a câmera do celular pelo campo de foto
+    const i=document.createElement('input');i.type='file';i.accept='image/*';i.capture='environment';
+    i.onchange=async()=>{const f=i.files[0];if(!f)return;const n=form.fotos.findIndex(x=>!x);if(n<0)return;form.fotos[n]=await novaFoto(f);renderAbast();lerLitrosBomba()};i.click();return}
+  if(!fs.length)return;
+  for(const b of fs){const k='f_'+uid();await fotoPut(k,b);const n=form.fotos.findIndex(x=>!x);if(n<0)break;form.fotos[n]={k,arq:null}}
+  renderAbast();lerLitrosBomba();
+};
+/* Lê os litros no visor da bomba (pelo Google, precisa de internet). A pessoa sempre pode digitar. */
+async function lerLitrosBomba(){
+  const L=$('abLeit'),fs=form.fotos.filter(Boolean);if(!fs.length)return;
+  if(!apiUrl()||!navigator.onLine){L.hidden=false;L.className='leitura aviso';L.textContent='Fotos guardadas. Sem internet para ler os litros — digite abaixo.';return}
+  L.hidden=false;L.className='leitura';L.textContent='Lendo os litros na foto…';
+  for(const sl of fs){
+    try{const b=await fotoGet(sl.k);
+      const j=await (await fetch(apiUrl(),{method:'POST',body:JSON.stringify({acao:'lerNota',imagem:await b64De(b),tipo:'image/jpeg'})})).json();
+      const lt=litrosDoTexto(j.texto||'');
+      if(lt){if(!$('abLitros').value||$('abLitros').dataset.auto==='1'){$('abLitros').value=String(lt);$('abLitros').dataset.auto='1'}
+        L.className='leitura ok';L.innerHTML=`✓ Li <b>${fmtL(lt)} litros</b> na foto. Confira e corrija se precisar.`;return}
+    }catch(e){}
+  }
+  L.className='leitura aviso';L.textContent='Não consegui ler os litros na foto. Digite a quantidade abaixo.';
+}
+function litrosDoTexto(t){
+  const U=t.toUpperCase();
+  const nums=[...U.matchAll(/\d{1,3}(?:[.\s]\d{3})*[,.]\d{1,3}|\d+/g)].map(x=>{let s=x[0].replace(/\s/g,'');if(/,/.test(s))s=s.replace(/\./g,'').replace(',','.');else if(/\.\d{3}$/.test(s)&&s.split('.').length>2)s=s.replace(/\./g,'');return parseFloat(s)}).filter(n=>n>0&&n<100000);
+  // 1) número logo depois de LITROS / VOLUME / L
+  let m=U.match(/(?:LITROS?|VOLUME|LTS?)\s*[:\-]?\s*(\d{1,5}(?:[.,]\d{1,3})?)/);
+  if(m){const v=parseFloat(m[1].replace(',','.'));if(v>0)return Math.round(v)}
+  m=U.match(/(\d{1,5}(?:[.,]\d{1,3})?)\s*(?:LITROS?|LTS?|L\b)/);
+  if(m){const v=parseFloat(m[1].replace(',','.'));if(v>0)return Math.round(v)}
+  // 2) bomba mostra TOTAL, LITROS e PREÇO: litros × preço = total
+  for(const p of nums)if(p>=3&&p<=15)for(const q of nums)if(q!==p&&q>=1)for(const tot of nums)if(Math.abs(q*p-tot)<=Math.max(0.6,tot*0.005)&&tot>q)return Math.round(q);
+  return null;
+}
+$('abLitros').addEventListener('input',()=>{$('abLitros').dataset.auto=''});
 /* ---------- Janela (editar / senha / confirmar) ---------- */
-function janela(html,montar){
-  const f=document.createElement('div');f.className='fundo';f.innerHTML=`<div class="janela">${html}</div>`;
+function janela(html,montar,cls){
+  const f=document.createElement('div');f.className='fundo';f.innerHTML=`<div class="janela ${cls||''}">${html}</div>`;
   document.body.appendChild(f);const fechar=()=>f.remove();
   f.onclick=e=>{if(e.target===f)fechar()};montar(f.firstChild,fechar);
 }
@@ -558,14 +686,14 @@ function pedirSenhaAntiga(ok){
 }
 function editar(rec,origem){
   if(!rec)return;
-  const t={...rec,fotos:(rec.fotos||[null,null]).slice()};
+  const t={...rec,fotos:[0,1,2,3].map(i=>(rec.fotos||[])[i]||null)};
   janela(`<h3>Editar abastecimento</h3>
     <div><label>Data</label><input type="date" id="eD" value="${t.data}"></div>
     <div><label>Fazenda</label><div class="escolha" id="eF"></div></div>
     <div><label>Equipamento</label><div class="escolha eq" id="eE"></div></div>
     <div><label>Litros</label><input type="text" class="big" id="eL" inputmode="numeric" pattern="[0-9]*" autocomplete="off" value="${Math.round(t.litros)}"></div>
     <div><label>Observação</label><textarea id="eO">${esc(t.obs)}</textarea></div>
-    <div><label>Fotos (até 2)</label><div class="fotos" id="eFt"></div></div>
+    <div><label>Fotos (até 4)</label><div class="fotos" id="eFt"></div></div>
     <button class="verde" id="eSalvar">✓ Salvar alteração</button>
     <div class="row"><button id="eCanc">Cancelar</button><button class="danger" id="eExc">🗑 Excluir</button></div>`,(j,fechar)=>{
     const desenha=()=>{
@@ -586,7 +714,7 @@ function editar(rec,origem){
       perguntar('Você realmente deseja salvar a alteração?','Sim, salvar','var(--verde)',()=>{
         t.alteradoEm=new Date().toISOString();abs=abs.map(a=>a.id===t.id?t:a);gravar(K.abs,abs);
         const i=fila.findIndex(f=>f.acao==='abastecer'&&f.dados.id===t.id);
-        if(i>=0&&!(enviando&&i===0))fila[i].dados={...t,fotos:[null,null]};else fila.push({acao:'editar',dados:t,senha:SENHA});
+        if(i>=0&&!(enviando&&i===0))fila[i].dados={...t,fotos:[]};else fila.push({acao:'editar',dados:t,senha:SENHA});
         filaFotos(t.id,rec.fotos,t.fotos);
         gravar(K.fila,fila);enviarFila();fechar();render();toast('Alteração salva');
       });
@@ -596,7 +724,8 @@ function editar(rec,origem){
 }
 
 /* ---------- Histórico ---------- */
-const filtro={periodo:'7',de:'',ate:'',faz:'',eq:''};
+const filtro={periodo:'7',de:'',ate:'',faz:'',off:new Set()}; // off = equipamentos desmarcados
+let eqsVisiveis=[];
 function aplicaPeriodo(p){
   const h=new Date();filtro.periodo=p;filtro.ate=chaveDia(h);
   if(p==='hoje')filtro.de=filtro.ate;
@@ -608,7 +737,8 @@ aplicaPeriodo('7');
 $('hPeriodo').querySelectorAll('button').forEach(b=>b.onclick=()=>{aplicaPeriodo(b.dataset.p);renderHist()});
 $('hDe').onchange=e=>{filtro.de=e.target.value;filtro.periodo='';renderHist()};
 $('hAte').onchange=e=>{filtro.ate=e.target.value;filtro.periodo='';renderHist()};
-$('hEq').onchange=e=>{filtro.eq=e.target.value;renderHist()};
+$('hEqTodos').onclick=()=>{filtro.off=new Set();renderHist()};
+$('hEqNenhum').onclick=()=>{filtro.off=new Set(eqsVisiveis.map(e=>e.id));renderHist()};
 function renderHist(){
   $('hPeriodo').querySelectorAll('button').forEach(b=>b.classList.toggle('sel',b.dataset.p===filtro.periodo));
   $('hDe').value=filtro.de;$('hAte').value=filtro.ate;
@@ -616,7 +746,7 @@ function renderHist(){
   const fz=[...cad.fazendas.map(f=>({id:f.id,nome:f.nome}))];
   abs.forEach(a=>{if(!fz.find(f=>f.id===a.fazendaId))fz.push({id:a.fazendaId,nome:a.fazenda})});
   $('hFaz').innerHTML=`<button data-f="" class="${!filtro.faz?'sel':''}">Todas</button>`+fz.map(f=>`<button data-f="${f.id}" class="${filtro.faz===f.id?'sel':''}">${esc(f.nome)}</button>`).join('');
-  $('hFaz').querySelectorAll('button').forEach(b=>b.onclick=()=>{filtro.faz=b.dataset.f;filtro.eq='';renderHist()});
+  $('hFaz').querySelectorAll('button').forEach(b=>b.onclick=()=>{filtro.faz=b.dataset.f;filtro.off=new Set();renderHist()});
   // equipamentos: os que estão na fazenda agora + os que já abasteceram lá
   let eqs=[];
   if(filtro.faz){
@@ -626,9 +756,10 @@ function renderHist(){
     cad.equipamentos.filter(e=>!e.inativo).forEach(e=>eqs.push({id:e.id,nome:e.nome,obs:fazPorId(e.fazendaId)?' — '+fazPorId(e.fazendaId).nome:''}));
     abs.forEach(a=>{if(!eqs.find(e=>e.id===a.equipId))eqs.push({id:a.equipId,nome:a.equipamento,obs:''})});
   }
-  if(filtro.eq&&!eqs.find(e=>e.id===filtro.eq))filtro.eq='';
-  $('hEq').innerHTML='<option value="">Todos os equipamentos</option>'+eqs.map(e=>`<option value="${e.id}" ${filtro.eq===e.id?'selected':''}>${esc(e.nome+e.obs)}</option>`).join('');
-  const l=abs.filter(a=>(!filtro.de||a.data>=filtro.de)&&(!filtro.ate||a.data<=filtro.ate)&&(!filtro.faz||a.fazendaId===filtro.faz)&&(!filtro.eq||a.equipId===filtro.eq))
+  eqsVisiveis=eqs;
+  $('hEq').innerHTML=eqs.map(e=>`<label class="eqChk ${filtro.off.has(e.id)?'':'on'}"><input type="checkbox" data-eq="${e.id}" ${filtro.off.has(e.id)?'':'checked'}><span>${esc(e.nome)}${e.obs?`<small>${esc(e.obs.replace(/^ — /,''))}</small>`:''}</span></label>`).join('')||'<div class="vazio">Nenhum equipamento.</div>';
+  $('hEq').querySelectorAll('[data-eq]').forEach(i=>i.onchange=()=>{if(i.checked)filtro.off.delete(i.dataset.eq);else filtro.off.add(i.dataset.eq);renderHist()});
+  const l=abs.filter(a=>(!filtro.de||a.data>=filtro.de)&&(!filtro.ate||a.data<=filtro.ate)&&(!filtro.faz||a.fazendaId===filtro.faz)&&!filtro.off.has(a.equipId))
     .sort((a,b)=>b.data.localeCompare(a.data)||String(b.registradoEm).localeCompare(String(a.registradoEm)));
   const tot=l.reduce((s,a)=>s+Number(a.litros||0),0);
   $('hQtd').textContent=l.length;$('hTot').textContent=fmtL(tot)+' L';$('hMed').textContent=l.length?fmtL(tot/l.length)+' L':'—';
@@ -667,7 +798,8 @@ const recentesE=()=>pendE.filter(p=>restante(p)>0).map(p=>({p,a:ents.find(a=>a.i
 
 function renderEnt(){
   $('enFaz').innerHTML=cad.fazendas.map(f=>`<button data-f="${f.id}" class="${fe.faz===f.id?'sel':''}">${esc(f.nome)}<small>estoque ${fmtL(saldoFaz(f.id))} L</small></button>`).join('');
-  $('enFaz').querySelectorAll('button').forEach(b=>b.onclick=()=>{fe.faz=b.dataset.f;renderEnt()});
+  $('enFaz').querySelectorAll('button').forEach(b=>b.onclick=()=>{const novo=!fe.faz;fe.faz=b.dataset.f;renderEnt();if(novo)setTimeout(()=>$('enCampos').scrollIntoView({behavior:'smooth',block:'start'}),60)});
+  $('enCampos').hidden=!fe.faz;
   if(!$('enData').value)$('enData').value=chaveDia();
   const m=$('enMini');m.innerHTML='';fe.fotos.filter(Boolean).forEach(sl=>{if(sl.pdf){m.insertAdjacentHTML('beforeend','<span class="pdfChip">📄 PDF da nota</span>');return}fotoURL(sl).then(u=>{if(u){const im=new Image();im.src=u;m.appendChild(im)}})});
   $('enTirarFoto').hidden=!fe.fotos[0];
@@ -856,19 +988,19 @@ function renderEst(){
 
 /* ---------- Relatórios: PDF, Foto e Excel (gerados no próprio celular, sem internet) ---------- */
 function filtrados(){
-  return abs.filter(a=>(!filtro.de||a.data>=filtro.de)&&(!filtro.ate||a.data<=filtro.ate)&&(!filtro.faz||a.fazendaId===filtro.faz)&&(!filtro.eq||a.equipId===filtro.eq))
+  return abs.filter(a=>(!filtro.de||a.data>=filtro.de)&&(!filtro.ate||a.data<=filtro.ate)&&(!filtro.faz||a.fazendaId===filtro.faz)&&!filtro.off.has(a.equipId))
     .sort((a,b)=>a.data.localeCompare(b.data)||String(a.registradoEm).localeCompare(String(b.registradoEm)));
 }
 function descFiltro(){
   const per=filtro.de&&filtro.ate?(filtro.de===filtro.ate?fmtData(filtro.de):fmtData(filtro.de)+' a '+fmtData(filtro.ate)):filtro.de?'Desde '+fmtData(filtro.de):filtro.ate?'Até '+fmtData(filtro.ate):'Todo o período';
   const fz=filtro.faz?((fazPorId(filtro.faz)||abs.find(a=>a.fazendaId===filtro.faz)||{}).nome||(abs.find(a=>a.fazendaId===filtro.faz)||{}).fazenda):'Todas as fazendas';
-  const eq=filtro.eq?((eqPorId(filtro.eq)||{}).nome||(abs.find(a=>a.equipId===filtro.eq)||{}).equipamento):'Todos os equipamentos';
+  const mar=eqsVisiveis.filter(e=>!filtro.off.has(e.id));const eq=!filtro.off.size?'Todos os equipamentos':(mar.length<=3?mar.map(e=>e.nome).join(', '):mar.length+' equipamentos');
   return per+' · '+fz+' · '+eq;
 }
 function nomeArq(l,ext){
   const ds=[...new Set(l.map(a=>a.data))].sort(),f=k=>{const[y,m,d]=k.split('-');return d+'-'+m+'-'+y};
   const per=ds.length?(ds.length===1?f(ds[0]):f(ds[0])+' a '+f(ds[ds.length-1])):'';
-  const fz=filtro.faz?' - '+(l[0]?l[0].fazenda:''):'',eq=filtro.eq?' - '+(l[0]?l[0].equipamento:''):'';
+  const fz=filtro.faz?' - '+(l[0]?l[0].fazenda:''):'',eq=filtro.off.size&&new Set(l.map(a=>a.equipId)).size===1?' - '+(l[0]?l[0].equipamento:''):'';
   return `Abastecimentos ${per}${fz}${eq}.${ext}`.replace(/[\\/:*?"<>|]/g,'-');
 }
 function baixar(blob,nome){const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=nome;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000)}
@@ -935,7 +1067,7 @@ function desenharPagina(itens,l,primeira,pageH,pag,totPag){
       c.font=`italic 14px ${F}`;c.fillStyle=CINZA;obsLinhas(a).forEach((t,k)=>c.fillText(t,605,y+26+k*18));
       c.fillStyle=NAVY;c.font=`bold 17px ${F}`;c.textAlign='right';c.fillText(fmtL(a.litros),960,y+26);c.textAlign='left';
       if(i.imgs&&i.imgs.length){const y0=y+Math.max(40,obsLinhas(a).length*18+16);let x=215;
-        for(const im of i.imgs){const w=Math.min(360,im.width*FH/im.height);c.drawImage(im,x,y0,w,FH);c.strokeStyle='#dde3ea';c.strokeRect(x,y0,w,FH);x+=w+12}}
+        const q=i.imgs.length,lim=(RW-30-215-12*(q-1))/q;for(const im of i.imgs){let w=Math.min(360,lim,im.width*FH/im.height),h=w*im.height/im.width;if(h>FH){h=FH;w=FH*im.width/im.height}c.drawImage(im,x,y0,w,h);c.strokeStyle='#dde3ea';c.strokeRect(x,y0,w,h);x+=w+12}}
       c.fillStyle='#dde3ea';c.fillRect(30,y+alt(i)-1,RW-60,1)}
     else{c.fillStyle=NAVY;c.fillRect(30,y+8,RW-60,ALT.total-8);c.fillStyle='#fff';c.font=`bold 19px ${F}`;
       c.fillText(`TOTAL · ${i.n} abastecimento${i.n===1?'':'s'}`,40,y+38);c.textAlign='right';c.fillStyle='#c8dd1e';c.fillText(fmtL(i.s)+' L',960,y+38);c.textAlign='left'}
@@ -1083,9 +1215,10 @@ function renderCad(){
   if(!cadLiberado)return;
   $('apiUrl').value=ler(K.api,'')||API_PADRAO;
   $('cadLista').innerHTML=cad.fazendas.map(f=>{
-    const eqs=eqsDaFaz(f.id);
+    const eqs=eqsDaFaz(f.id),ina=cad.equipamentos.filter(e=>e.fazendaId===f.id&&e.inativo);
     return `<div class="fzBloco"><div class="fzCab"><b>${esc(f.nome)}</b><span><button class="mini" data-rf="${f.id}">✎</button> <button class="mini" data-xf="${f.id}">🗑</button></span></div>
-      ${eqs.map(e=>`<div class="eqLinha"><span>${esc(e.nome)}</span><button class="mini" data-mv="${e.id}" title="Mudar de fazenda">⇄ Mudar</button><button class="mini" data-re="${e.id}">✎</button><button class="mini danger" data-xe="${e.id}">🗑</button></div>`).join('')||'<div class="eqLinha"><span class="note">Nenhum equipamento</span></div>'}
+      ${eqs.map(e=>`<div class="eqLinha"><span>${esc(e.nome)}</span><button class="mini" data-mv="${e.id}" title="Mudar de fazenda">⇄ Mudar</button><button class="mini" data-re="${e.id}">✎</button>${temLanc(e.id)?`<button class="mini inativar" data-in="${e.id}">⏸ Inativar</button>`:`<button class="mini danger" data-xe="${e.id}">🗑</button>`}</div>`).join('')||'<div class="eqLinha"><span class="note">Nenhum equipamento ativo</span></div>'}
+      ${ina.map(e=>`<div class="eqLinha inativo"><span>${esc(e.nome)} <span class="tag">inativo</span></span><button class="mini" data-at="${e.id}">▶ Reativar</button></div>`).join('')}
       <div class="addLinha"><input type="text" placeholder="Novo equipamento" data-ni="${f.id}"><button class="lima mini" data-ae="${f.id}">+ Adicionar</button></div></div>`}).join('')||'<div class="vazio">Nenhuma fazenda cadastrada.</div>';
   const L=$('cadLista');
   L.querySelectorAll('[data-ae]').forEach(b=>b.onclick=()=>{const i=L.querySelector(`[data-ni="${b.dataset.ae}"]`);const n=i.value.trim();if(!n){i.focus();return}
@@ -1094,14 +1227,20 @@ function renderCad(){
   L.querySelectorAll('[data-re]').forEach(b=>b.onclick=()=>renomear(eqPorId(b.dataset.re),'equipamento'));
   L.querySelectorAll('[data-rf]').forEach(b=>b.onclick=()=>renomear(fazPorId(b.dataset.rf),'fazenda'));
   L.querySelectorAll('[data-mv]').forEach(b=>b.onclick=()=>mudarFaz(eqPorId(b.dataset.mv)));
-  L.querySelectorAll('[data-xe]').forEach(b=>b.onclick=()=>{const e=eqPorId(b.dataset.xe);confirmar(`Excluir ${e.nome}?`,()=>{
-    if(abs.some(a=>a.equipId===e.id)||pend.some(a=>a.equipId===e.id))e.inativo=true;else cad.equipamentos=cad.equipamentos.filter(x=>x.id!==e.id);
-    salvarCad('Equipamento excluído (o histórico continua)')})});
+  // excluir: só quando o equipamento não tem nenhum lançamento
+  L.querySelectorAll('[data-xe]').forEach(b=>b.onclick=()=>{const e=eqPorId(b.dataset.xe);
+    if(temLanc(e.id)){toast('Este equipamento tem lançamentos: use Inativar');renderCad();return}
+    confirmar(`Excluir ${e.nome}?`,()=>{cad.equipamentos=cad.equipamentos.filter(x=>x.id!==e.id);salvarCad('Equipamento excluído')})});
+  // inativar: some do Abastecer, mas o histórico continua
+  L.querySelectorAll('[data-in]').forEach(b=>b.onclick=()=>{const e=eqPorId(b.dataset.in);
+    perguntar(`Inativar ${e.nome}? Ele some do Abastecer, mas os lançamentos continuam no histórico.`,'Sim, inativar','var(--warn)',()=>{e.inativo=true;salvarCad(`${e.nome} inativado`)})});
+  L.querySelectorAll('[data-at]').forEach(b=>b.onclick=()=>{const e=eqPorId(b.dataset.at);e.inativo=false;salvarCad(`${e.nome} reativado`)});
   L.querySelectorAll('[data-xf]').forEach(b=>b.onclick=()=>{const f=fazPorId(b.dataset.xf);
-    if(eqsDaFaz(f.id).length){toast('Mude ou exclua os equipamentos desta fazenda primeiro');return}
+    if(cad.equipamentos.some(e=>e.fazendaId===f.id)){toast('Mude ou exclua os equipamentos desta fazenda primeiro');return}
     confirmar(`Excluir ${f.nome}?`,()=>{cad.fazendas=cad.fazendas.filter(x=>x.id!==f.id);salvarCad('Fazenda excluída')})});
   $('movLista').innerHTML=cad.mov.slice(0,30).map(m=>`<div class="mov"><b>${esc(m.equipamento)}</b>: ${esc(m.de)} → ${esc(m.para)} <span class="note">· ${fmtData(chaveDia(new Date(m.em)))} ${fmtHora(m.em)}</span></div>`).join('')||'<p class="note">Nenhuma mudança registrada.</p>';
 }
+const temLanc=id=>abs.some(a=>a.equipId===id);
 function renomear(obj,tipo){
   janela(`<h3>Renomear ${tipo}</h3><input type="text" id="jN" value="${esc(obj.nome)}"><div class="row"><button id="jC">Cancelar</button><button class="primary" id="jO">Salvar</button></div>`,(j,fechar)=>{
     const i=j.querySelector('#jN');setTimeout(()=>i.select(),60);j.querySelector('#jC').onclick=fechar;
@@ -1157,7 +1296,7 @@ function aplicaFila(){
     if(f.acao==='entrada'&&!ents.find(a=>a.id===f.dados.id))ents.push(f.dados);
     if(f.acao==='editarEntrada')ents=ents.map(a=>a.id===f.dados.id?f.dados:a);
     if(f.acao==='excluirEntrada')ents=ents.filter(a=>a.id!==f.dados.id);
-    if(f.acao==='foto'){const a=(f.dados.tab==='ent'?ents:abs).find(x=>x.id===f.dados.id);if(a){a.fotos=(a.fotos||[null,null]).slice();a.fotos[f.dados.n]=f.dados.k?{k:f.dados.k,arq:null}:null}}
+    if(f.acao==='foto'){const a=(f.dados.tab==='ent'?ents:abs).find(x=>x.id===f.dados.id);if(a){a.fotos=(a.fotos||[]).slice();a.fotos[f.dados.n]=f.dados.k?{k:f.dados.k,arq:null}:null}}
   }
 }
 async function carregar(){
@@ -1179,7 +1318,7 @@ window.addEventListener('online',carregar);
 setInterval(()=>{if(document.visibilityState==='visible')carregar()},60000);
 
 /* ---------- Início ---------- */
-const VERSAO='4';
+const VERSAO='8';
 function marcaAtualizado(d){if(d)gravar('ab_sync',d);const x=ler('ab_sync',null);const t=x?new Date(x):new Date();
   $('hoje').textContent=`Atualizado ${String(t.getDate()).padStart(2,'0')}/${String(t.getMonth()+1).padStart(2,'0')} às ${fmtHora(t.toISOString())} – v${VERSAO}`}
 marcaAtualizado();
