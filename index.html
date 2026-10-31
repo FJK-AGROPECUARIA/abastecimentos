@@ -106,6 +106,16 @@ details.pend:not([open]){gap:0}
 .relogio{font-weight:700;color:var(--warn);font-variant-numeric:tabular-nums}
 /* Histórico */
 .periodo{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.estMini{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:8px}
+.estMini button{background:var(--chip);border:2px solid var(--lima);border-radius:12px;padding:8px 4px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px;min-height:0;color:var(--fg)}
+.estMini button.sel{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent) inset;background:#d3e7f0}
+.estMini small{font-size:.74rem;font-weight:700;letter-spacing:.04em;color:var(--muted);text-transform:uppercase}
+.estMini b{font-family:var(--display);font-stretch:condensed;font-size:clamp(1.05rem,5.6vw,1.5rem);color:var(--ok);line-height:1.1;white-space:nowrap}.estMini b.neg{color:var(--bad)}
+.tipoMov{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:6px}
+.tipoMov button{border:0;border-radius:12px;padding:13px 4px;font-weight:700;font-size:1rem;background:transparent;color:var(--fg)}
+.tipoMov button.sel{background:var(--accent);color:#fff}
+.reg .lt.mais{color:var(--verde)}
+#tHist .stat b{white-space:nowrap;font-size:clamp(1.05rem,5.2vw,1.6rem)}
 .periodo button{padding:8px 4px;font-size:.9rem;border-radius:99px}
 .periodo button.sel{background:var(--accent);border-color:var(--accent);color:#fff}
 .datas{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
@@ -254,8 +264,7 @@ button.cancelarBtn{background:var(--bad);border-color:var(--bad);color:#fff;font
     <div class="gTiles">
       <button data-ir="ent" style="--c:#1f7a4d"><span class="gIc">🚚</span>Entradas</button>
       <button data-ir="sai" style="--c:#9a3b2c"><span class="gIc">📤</span>Saídas</button>
-      <button data-ir="est" style="--c:#2c4f7c"><span class="gIc">🛢️</span>Estoque</button>
-      <button data-ir="hist" style="--c:#3d84c6"><span class="gIc">📖</span>Histórico</button>
+      <button data-ir="hist" style="--c:#2c4f7c"><span class="gIc">🛢️</span>Estoque / Histórico</button>
       <button data-ir="eq" style="--c:#5f6b73"><span class="gIc">🚜</span>Equipamentos</button>
       <button data-ir="op" style="--c:#8a5a12"><span class="gIc">👤</span>Operadores</button>
       <button data-ir="cad" style="--c:#11253d"><span class="gIc">⚙️</span>Configurações</button>
@@ -384,6 +393,12 @@ button.cancelarBtn{background:var(--bad);border-color:var(--bad);color:#fff;font
   <!-- HISTÓRICO -->
   <div id="tHist" hidden>
     <section class="panel">
+      <h2>Estoque atual</h2>
+      <div class="estMini" id="hEst"></div>
+      <div class="note" id="hEstTot" style="text-align:right;margin:0"></div>
+    </section>
+    <div class="tipoMov" id="hTipo"><button data-t="todos">Todos</button><button data-t="ent">🚚 Entradas</button><button data-t="sai">⛽ Saídas</button></div>
+    <section class="panel">
       <h2>Filtros</h2>
       <div class="periodo" id="hPeriodo">
         <button data-p="hoje">Hoje</button><button data-p="7">7 dias</button><button data-p="mes">Mês</button><button data-p="tudo">Tudo</button>
@@ -393,18 +408,18 @@ button.cancelarBtn{background:var(--bad);border-color:var(--bad);color:#fff;font
         <div><label for="hAte">Até</label><input type="date" id="hAte"></div>
       </div>
       <div><label>Fazenda</label><div class="chips" id="hFaz"></div></div>
-      <div><div class="eqTopo"><label>Equipamentos</label><span><button class="mini" id="hEqTodos">✓ Marcar todos</button> <button class="mini" id="hEqNenhum">Desmarcar todos</button></span></div><div class="eqMarcar" id="hEq"></div></div>
+      <div id="hEqBox"><div class="eqTopo"><label>Equipamentos</label><span><button class="mini" id="hEqTodos">✓ Marcar todos</button> <button class="mini" id="hEqNenhum">Desmarcar todos</button></span></div><div class="eqMarcar" id="hEq"></div></div>
     </section>
     <section class="panel">
       <div class="stat">
-        <div><small>Abastecimentos</small><b class="num" id="hQtd">0</b></div>
-        <div><small>Total de litros</small><b class="num" id="hTot">0</b></div>
-        <div><small>Média</small><b class="num" id="hMed">0</b></div>
+        <div><small id="hS1">Abastecimentos</small><b class="num" id="hQtd">0</b></div>
+        <div><small id="hS2">Total de litros</small><b class="num" id="hTot">0</b></div>
+        <div><small id="hS3">Média</small><b class="num" id="hMed">0</b></div>
       </div>
-      <label class="opcao"><input type="checkbox" id="hComFotos"> Mostrar fotos no relatório</label>
+      <label class="opcao" id="hFotosOp"><input type="checkbox" id="hComFotos"> Mostrar fotos no relatório</label>
       <div class="compart"><button class="verde" id="hPdf">📄 PDF</button><button class="verde" id="hImg">🖼 Foto</button><button class="verde" id="hXls">📊 Excel</button></div>
       <div id="hLista"></div>
-      <p class="note">Toque num registro para ver os detalhes e as fotos. Editar ou excluir pede senha.</p>
+      <p class="note">Toque numa movimentação para ver os detalhes. Editar ou excluir pede senha.</p>
     </section>
   </div>
 
@@ -538,7 +553,7 @@ function filaFotos(id,antes,depois,tab){
 
 /* ---------- Navegação ---------- */
 let tela='inicio',cadLiberado=false;
-const TITULOS={inicio:'Abastecimentos',gest:'Gestão',abast:'Abastecer',ent:'Entradas',est:'Estoque',hist:'Histórico',cad:'Configurações',eq:'Equipamentos',op:'Operadores',sai:'Saídas'};
+const TITULOS={inicio:'Abastecimentos',gest:'Gestão',abast:'Abastecer',ent:'Entradas',est:'Estoque',hist:'Estoque / Histórico',cad:'Configurações',eq:'Equipamentos',op:'Operadores',sai:'Saídas'};
 function ir(t){
   tela=t;document.body.classList.toggle('naInicio',t==='inicio');
   $('tAbast').hidden=t!=='abast';$('tGest').hidden=t!=='gest';$('tEnt').hidden=t!=='ent';$('tSai').hidden=t!=='sai';$('tEst').hidden=t!=='est';$('tHist').hidden=t!=='hist';$('tCad').hidden=!['cad','eq','op'].includes(t);
@@ -551,7 +566,7 @@ function limparTela(t){
   document.querySelectorAll('.fundo').forEach(x=>x.remove());
   if(t==='abast'){form.fechado=false;form.data=chaveDia();form.faz=null;form.op=null;form.eq=null;form.fotos=[null,null,null,null];$('abLitros').value='';$('abLitros').dataset.auto='';$('abObs').value='';$('abLeit').hidden=true}
   if(t==='ent'){fe.faz=null;fe.fotos=[null,null];['enForn','enNF','enLitros','enTotal','enVL','enObs'].forEach(i=>$(i).value='');$('enData').value=chaveDia();$('enLeitura').hidden=true}
-  if(t==='hist'){aplicaPeriodo('7');filtro.faz='';filtro.off=new Set();$('hComFotos').checked=false}
+  if(t==='hist'){filtro.tipo='todos';aplicaPeriodo('7');filtro.faz='';filtro.off=new Set();$('hComFotos').checked=false}
   if(t==='est'){fest.faz='';fest.per='30'}
   if(t==='sai'){fs.faz=null;$('saQtd').value='';$('saObs').value='';$('saData').value=chaveDia()}
 }
@@ -808,7 +823,7 @@ function editar(rec,origem){
 }
 
 /* ---------- Histórico ---------- */
-const filtro={periodo:'7',de:'',ate:'',faz:'',off:new Set()}; // off = equipamentos desmarcados
+const filtro={tipo:'todos',periodo:'7',de:'',ate:'',faz:'',off:new Set()}; // off = equipamentos desmarcados
 let eqsVisiveis=[];
 function aplicaPeriodo(p){
   const h=new Date();filtro.periodo=p;filtro.ate=chaveDia(h);
@@ -821,43 +836,71 @@ aplicaPeriodo('7');
 $('hPeriodo').querySelectorAll('button').forEach(b=>b.onclick=()=>{aplicaPeriodo(b.dataset.p);renderHist()});
 $('hDe').onchange=e=>{filtro.de=e.target.value;filtro.periodo='';renderHist()};
 $('hAte').onchange=e=>{filtro.ate=e.target.value;filtro.periodo='';renderHist()};
+$('hTipo').querySelectorAll('button').forEach(b=>b.onclick=()=>{filtro.tipo=b.dataset.t;filtro.off=new Set();renderHist()});
 $('hEqTodos').onclick=()=>{filtro.off=new Set();renderHist()};
 $('hEqNenhum').onclick=()=>{filtro.off=new Set(eqsVisiveis.map(e=>e.id));renderHist()};
+/* movimentações: entradas (notas), abastecimentos e saídas manuais */
+const ehOutro=id=>String(id).startsWith('outro:');
+function movsFiltro(){
+  const r=[],t=filtro.tipo;
+  if(t!=='ent')abs.forEach(a=>r.push({t:'abs',a,eq:a.equipId,q:-Number(a.litros||0)}));
+  ents.forEach(e=>{const s=ehSaida(e);if(s?t==='ent':t==='sai')return;r.push({t:s?'sai':'ent',a:e,eq:s?'manual':'',q:Number(e.litros||0)})});
+  return r.filter(m=>(!filtro.de||m.a.data>=filtro.de)&&(!filtro.ate||m.a.data<=filtro.ate)&&(!filtro.faz||m.a.fazendaId===filtro.faz)&&!(t==='sai'&&filtro.off.has(m.eq)));
+}
+const ordAsc=(x,y)=>x.a.data.localeCompare(y.a.data)||String(x.a.registradoEm).localeCompare(String(y.a.registradoEm));
+function statsMov(l){
+  const e=l.filter(m=>m.q>0).reduce((s,m)=>s+m.q,0),s=-l.filter(m=>m.q<0).reduce((s,m)=>s+m.q,0);
+  if(filtro.tipo==='ent'){const v=l.reduce((s,m)=>s+(Number(m.a.valorTotal)||0),0);return[['Notas',String(l.length)],['Litros',fmtL(e)+' L'],['Valor total',v?'R$ '+fmtL(v):'—']]}
+  if(filtro.tipo==='sai')return[['Saídas',String(l.length)],['Total de litros',fmtL(s)+' L'],['Média',l.length?fmtL(s/l.length)+' L':'—']];
+  return[['Entradas','+'+fmtL(e)+' L'],['Saídas','−'+fmtL(s)+' L'],['Saldo do período',fmtL(e-s)+' L']];
+}
 function renderHist(){
+  // estoque atual por fazenda (toque para filtrar)
+  let tg=0;
+  $('hEst').innerHTML=cad.fazendas.map(f=>{const sd=saldoFaz(f.id);tg+=sd;return `<button data-f="${f.id}" class="${filtro.faz===f.id?'sel':''}"><small>${esc(f.nome)}</small><b class="${sd<0?'neg':''}">${fmtL(sd)} L</b></button>`}).join('');
+  $('hEstTot').innerHTML=`Total: <b>${fmtL(tg)} L</b>`;
+  $('hEst').querySelectorAll('button').forEach(b=>b.onclick=()=>{filtro.faz=filtro.faz===b.dataset.f?'':b.dataset.f;filtro.off=new Set();renderHist()});
+  $('hTipo').querySelectorAll('button').forEach(b=>b.classList.toggle('sel',b.dataset.t===filtro.tipo));
   $('hPeriodo').querySelectorAll('button').forEach(b=>b.classList.toggle('sel',b.dataset.p===filtro.periodo));
   $('hDe').value=filtro.de;$('hAte').value=filtro.ate;
-  // fazendas: as cadastradas + as que aparecem nos registros
   const fz=[...cad.fazendas.map(f=>({id:f.id,nome:f.nome}))];
-  abs.forEach(a=>{if(!fz.find(f=>f.id===a.fazendaId))fz.push({id:a.fazendaId,nome:a.fazenda})});
+  [...abs,...ents].forEach(a=>{if(!fz.find(f=>f.id===a.fazendaId))fz.push({id:a.fazendaId,nome:a.fazenda})});
   $('hFaz').innerHTML=`<button data-f="" class="${!filtro.faz?'sel':''}">Todas</button>`+fz.map(f=>`<button data-f="${f.id}" class="${filtro.faz===f.id?'sel':''}">${esc(f.nome)}</button>`).join('');
   $('hFaz').querySelectorAll('button').forEach(b=>b.onclick=()=>{filtro.faz=b.dataset.f;filtro.off=new Set();renderHist()});
-  // equipamentos: os que estão na fazenda agora + os que já abasteceram lá
+  // equipamentos: só no filtro de Saídas
+  $('hEqBox').hidden=filtro.tipo!=='sai';$('hFotosOp').hidden=filtro.tipo==='ent';
   let eqs=[];
   if(filtro.faz){
     eqsDaFaz(filtro.faz).forEach(e=>eqs.push({id:e.id,nome:e.nome,obs:''}));
-    abs.filter(a=>a.fazendaId===filtro.faz).forEach(a=>{if(!eqs.find(e=>e.id===a.equipId)){const at=eqPorId(a.equipId);eqs.push({id:a.equipId,nome:String(a.equipId).startsWith('outro:')?'OUTRO':a.equipamento,obs:at&&fazPorId(at.fazendaId)?' (hoje em '+fazPorId(at.fazendaId).nome+')':''})}});
+    abs.filter(a=>a.fazendaId===filtro.faz).forEach(a=>{if(!eqs.find(e=>e.id===a.equipId)){const at=eqPorId(a.equipId);eqs.push({id:a.equipId,nome:ehOutro(a.equipId)?'OUTRO':a.equipamento,obs:at&&fazPorId(at.fazendaId)?' (hoje em '+fazPorId(at.fazendaId).nome+')':''})}});
   }else{
     cad.equipamentos.filter(e=>!e.inativo).forEach(e=>eqs.push({id:e.id,nome:e.nome,obs:fazPorId(e.fazendaId)?' — '+fazPorId(e.fazendaId).nome:''}));
-    abs.forEach(a=>{if(!eqs.find(e=>e.id===a.equipId))eqs.push({id:a.equipId,nome:String(a.equipId).startsWith('outro:')?'OUTRO':a.equipamento,obs:String(a.equipId).startsWith('outro:')?a.fazenda:''})});
+    abs.forEach(a=>{if(!eqs.find(e=>e.id===a.equipId))eqs.push({id:a.equipId,nome:ehOutro(a.equipId)?'OUTRO':a.equipamento,obs:ehOutro(a.equipId)?a.fazenda:''})});
   }
+  eqs.push({id:'manual',nome:'SAÍDA MANUAL',obs:'sem equipamento'});
   eqsVisiveis=eqs;
-  $('hEq').innerHTML=eqs.map(e=>`<label class="eqChk ${filtro.off.has(e.id)?'':'on'}"><input type="checkbox" data-eq="${e.id}" ${filtro.off.has(e.id)?'':'checked'}><span>${esc(e.nome)}${e.obs?`<small>${esc(e.obs.replace(/^ — /,''))}</small>`:''}</span></label>`).join('')||'<div class="vazio">Nenhum equipamento.</div>';
+  $('hEq').innerHTML=eqs.map(e=>`<label class="eqChk ${filtro.off.has(e.id)?'':'on'}"><input type="checkbox" data-eq="${e.id}" ${filtro.off.has(e.id)?'':'checked'}><span>${esc(e.nome)}${e.obs?`<small>${esc(e.obs.replace(/^ — /,''))}</small>`:''}</span></label>`).join('');
   $('hEq').querySelectorAll('[data-eq]').forEach(i=>i.onchange=()=>{if(i.checked)filtro.off.delete(i.dataset.eq);else filtro.off.add(i.dataset.eq);renderHist()});
-  const l=abs.filter(a=>(!filtro.de||a.data>=filtro.de)&&(!filtro.ate||a.data<=filtro.ate)&&(!filtro.faz||a.fazendaId===filtro.faz)&&!filtro.off.has(a.equipId))
-    .sort((a,b)=>b.data.localeCompare(a.data)||String(b.registradoEm).localeCompare(String(a.registradoEm)));
-  const tot=l.reduce((s,a)=>s+Number(a.litros||0),0);
-  $('hQtd').textContent=l.length;$('hTot').textContent=fmtL(tot)+' L';$('hMed').textContent=l.length?fmtL(tot/l.length)+' L':'—';
-  if(!l.length){$('hLista').innerHTML='<div class="vazio">Nenhum abastecimento neste filtro.</div>';['hPdf','hImg','hXls'].forEach(id=>$(id).disabled=true);return}
+  const l=movsFiltro().sort((x,y)=>-ordAsc(x,y));
+  const st=statsMov(l);[['hS1','hQtd'],['hS2','hTot'],['hS3','hMed']].forEach(([a,b],i)=>{$(a).textContent=st[i][0];$(b).textContent=st[i][1]});
+  if(!l.length){$('hLista').innerHTML='<div class="vazio">Nenhuma movimentação neste filtro.</div>';['hPdf','hImg','hXls'].forEach(id=>$(id).disabled=true);return}
   ['hPdf','hImg','hXls'].forEach(id=>$(id).disabled=false);
+  const todos=filtro.tipo==='todos',sd={};
+  l.forEach(m=>{const o=sd[m.a.data]=sd[m.a.data]||{e:0,s:0};if(m.q>0)o.e+=m.q;else o.s-=m.q});
   let html='',dia='';
-  const somaDia={};l.forEach(a=>somaDia[a.data]=(somaDia[a.data]||0)+Number(a.litros||0));
-  for(const a of l){
-    if(a.data!==dia){dia=a.data;html+=`<div class="dia"><span>${nomeDia(dia)}, ${fmtData(dia)}</span><span class="num">${fmtL(somaDia[dia])} L</span></div>`}
-    const naFila=fila.some(f=>f.dados&&f.dados.id===a.id)&&!enviando;
-    html+=`<button class="reg" data-id="${a.id}"><div><div class="eqn">${esc(a.equipamento)}${naFila?'<span class="tag">aguardando internet</span>':''}</div><div class="faz">${esc(a.fazenda)}${a.operador?' · 👤 '+esc(a.operador):''} · ${fmtHora(a.registradoEm)}${a.alteradoEm?' · alterado':''}${qtdFotos(a)?' · 📷 '+qtdFotos(a):''}</div>${a.obs?`<div class="obs">${esc(a.obs)}</div>`:''}</div><div class="lt">${fmtL(a.litros)} L</div></button>`;
+  for(const m of l){const a=m.a;
+    if(a.data!==dia){dia=a.data;const o=sd[dia];
+      html+=`<div class="dia"><span>${nomeDia(dia)}, ${fmtData(dia)}</span><span class="num">${todos?(o.e?'+'+fmtL(o.e)+' · ':'')+'−'+fmtL(o.s)+' L':fmtL(o.e+o.s)+' L'}</span></div>`}
+    const naFila=fila.some(f=>f.dados&&f.dados.id===a.id)&&!enviando,tag=naFila?'<span class="tag">aguardando internet</span>':'';
+    const lt=`<div class="lt ${todos&&m.q>0?'mais':''}">${todos?(m.q>0?'+':'−'):''}${fmtL(Math.abs(m.q))}</div>`;
+    let tit,sub;
+    if(m.t==='abs'){tit=(todos?'⛽ ':'')+esc(a.equipamento);sub=`${esc(a.fazenda)}${a.operador?' · 👤 '+esc(a.operador):''} · ${fmtHora(a.registradoEm)}${a.alteradoEm?' · alterado':''}${qtdFotos(a)?' · 📷 '+qtdFotos(a):''}`}
+    else if(m.t==='ent'){tit=todos?'🚚 Entrada'+(a.fornecedor?' · '+esc(a.fornecedor):''):esc(a.fornecedor||'Entrada');sub=`${esc(a.fazenda)}${a.nf?' · NF '+esc(a.nf):''} · ${fmtHora(a.registradoEm)}${Number(a.valorTotal)?' · '+fmtR(a.valorTotal):''}`}
+    else{tit='📤 Saída manual';sub=`${esc(a.fazenda)} · ${fmtHora(a.registradoEm)}`}
+    html+=`<button class="reg" data-t="${m.t}" data-id="${a.id}"><div><div class="eqn">${tit}${tag}</div><div class="faz">${sub}</div>${a.obs?`<div class="obs">${esc(a.obs)}</div>`:''}</div>${lt}</button>`;
   }
   $('hLista').innerHTML=html;
-  $('hLista').querySelectorAll('.reg').forEach(b=>b.onclick=()=>detalhes(abs.find(a=>a.id===b.dataset.id)));
+  $('hLista').querySelectorAll('.reg').forEach(b=>b.onclick=()=>b.dataset.t==='abs'?detalhes(abs.find(a=>a.id===b.dataset.id)):detalhesEnt(ents.find(e=>e.id===b.dataset.id)));
 }
 
 function detalhes(a){
@@ -984,7 +1027,7 @@ function renderRecE(){
     <div class="note">${fmtR(a.valorTotal)} · ${fmtRL(a.valorLitro)}/L${a.obs?' · <i>'+esc(a.obs)+'</i>':''}</div>
     <div class="row" style="align-items:center"><span class="relogio" data-r="${p.id}">⏱ ${mmss(restante(p))}</span>
     <button class="mini" data-ed="${p.id}" style="flex:0 0 auto">✎ Editar</button><button class="mini danger" data-ex="${p.id}" style="flex:0 0 auto">🗑 Excluir</button></div></div>`).join('');
-  const pode=id=>{const p=pendE.find(x=>x.id===id);if(p&&restante(p)>0)return true;toast('O tempo de 5 min acabou. Altere pelo Estoque, com senha.');renderEnt();return false};
+  const pode=id=>{const p=pendE.find(x=>x.id===id);if(p&&restante(p)>0)return true;toast('O tempo de 5 min acabou. Altere pelo Estoque / Histórico, com senha.');renderEnt();return false};
   $('enRecLista').querySelectorAll('[data-ed]').forEach(b=>b.onclick=()=>perguntar('Você realmente deseja editar esta entrada?','Sim, editar','var(--accent)',()=>{if(pode(b.dataset.ed))editarEnt(ents.find(a=>a.id===b.dataset.ed),'pend')}));
   $('enRecLista').querySelectorAll('[data-ex]').forEach(b=>b.onclick=()=>confirmar('Você realmente deseja excluir esta entrada?',()=>{if(pode(b.dataset.ex))excluirEnt(b.dataset.ex)}));
 }
@@ -1017,7 +1060,7 @@ function editarEnt(rec,origem){
     q('#xC').onclick=fechar;
     q('#xS').onclick=()=>{
       const lq=parseInt(q('#xQ').value,10);if(!(lq>0)){toast('Informe a quantidade');return}
-      if(origem==='pend'){const p=pendE.find(p=>p.id===t.id);if(!p||restante(p)<=0){toast('O tempo de 5 min acabou. Altere pelo Estoque, com senha.');fechar();render();return}}
+      if(origem==='pend'){const p=pendE.find(p=>p.id===t.id);if(!p||restante(p)<=0){toast('O tempo de 5 min acabou. Altere pelo Estoque / Histórico, com senha.');fechar();render();return}}
       perguntar('Você realmente deseja salvar a alteração?','Sim, salvar','var(--verde)',()=>{
         const tt=numBR(q('#xT').value),vv=numBR(q('#xV').value);
         Object.assign(t,{data:q('#xD').value||t.data,fornecedor:q('#xFo').value.trim(),nf:q('#xN').value.trim(),litros:lq,valorTotal:isNaN(tt)?'':tt,valorLitro:isNaN(vv)?'':vv,obs:q('#xO').value.trim(),alteradoEm:new Date().toISOString()});
@@ -1106,21 +1149,19 @@ function renderEst(){
 }
 
 /* ---------- Relatórios: PDF, Foto e Excel (gerados no próprio celular, sem internet) ---------- */
-function filtrados(){
-  return abs.filter(a=>(!filtro.de||a.data>=filtro.de)&&(!filtro.ate||a.data<=filtro.ate)&&(!filtro.faz||a.fazendaId===filtro.faz)&&!filtro.off.has(a.equipId))
-    .sort((a,b)=>a.data.localeCompare(b.data)||String(a.registradoEm).localeCompare(String(b.registradoEm)));
-}
+function filtrados(){return movsFiltro().sort(ordAsc)}
 function descFiltro(){
   const per=filtro.de&&filtro.ate?(filtro.de===filtro.ate?fmtData(filtro.de):fmtData(filtro.de)+' a '+fmtData(filtro.ate)):filtro.de?'Desde '+fmtData(filtro.de):filtro.ate?'Até '+fmtData(filtro.ate):'Todo o período';
-  const fz=filtro.faz?((fazPorId(filtro.faz)||abs.find(a=>a.fazendaId===filtro.faz)||{}).nome||(abs.find(a=>a.fazendaId===filtro.faz)||{}).fazenda):'Todas as fazendas';
+  const fz=filtro.faz?((fazPorId(filtro.faz)||{}).nome||([...abs,...ents].find(a=>a.fazendaId===filtro.faz)||{}).fazenda):'Todas as fazendas';
   const mar=eqsVisiveis.filter(e=>!filtro.off.has(e.id));const eq=!filtro.off.size?'Todos os equipamentos':(mar.length<=3?mar.map(e=>e.nome).join(', '):mar.length+' equipamentos');
-  return per+' · '+fz+' · '+eq;
+  return per+' · '+fz+(filtro.tipo==='sai'?' · '+eq:'');
 }
+const NOME_TIPO={todos:'Movimentações',ent:'Entradas',sai:'Saídas'};
 function nomeArq(l,ext){
-  const ds=[...new Set(l.map(a=>a.data))].sort(),f=k=>{const[y,m,d]=k.split('-');return d+'-'+m+'-'+y};
+  const ds=[...new Set(l.map(m=>m.a.data))].sort(),f=k=>{const[y,m,d]=k.split('-');return d+'-'+m+'-'+y};
   const per=ds.length?(ds.length===1?f(ds[0]):f(ds[0])+' a '+f(ds[ds.length-1])):'';
-  const fz=filtro.faz?' - '+(l[0]?l[0].fazenda:''):'',eq=filtro.off.size&&new Set(l.map(a=>a.equipId)).size===1?' - '+(l[0]?l[0].equipamento:''):'';
-  return `Abastecimentos ${per}${fz}${eq}.${ext}`.replace(/[\\/:*?"<>|]/g,'-');
+  const fz=filtro.faz?' - '+(l[0]?l[0].a.fazenda:''):'',eq=filtro.tipo==='sai'&&filtro.off.size&&new Set(l.map(m=>m.eq)).size===1?' - '+(l[0]?(l[0].a.equipamento||'Saída manual'):''):'';
+  return `${NOME_TIPO[filtro.tipo]} ${per}${fz}${eq}.${ext}`.replace(/[\\/:*?"<>|]/g,'-');
 }
 function baixar(blob,nome){const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=nome;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000)}
 async function compartilharArquivo(blob,nome,tipo){
@@ -1131,11 +1172,18 @@ async function compartilharArquivo(blob,nome,tipo){
 
 /* Desenho do relatório (usado na Foto e no PDF) */
 const RW=1000,RS=2,ALT={dia:38,reg:40,total:52};
-const COLX=[{t:'Data',x:40,w:95},{t:'Hora',x:138,w:55},{t:'Fazenda',x:196,w:110},{t:'Operador',x:310,w:120},{t:'Equipamento',x:434,w:150},{t:'Litros',x:680,dir:1},{t:'Observação',x:705,w:260}];
+const cDat={t:'Data',x:40,g:m=>fmtData(m.a.data)},cHora={t:'Hora',x:138,g:m=>fmtHora(m.a.registradoEm)};
+const descMov=m=>m.t==='abs'?m.a.equipamento+(m.a.operador?' · '+m.a.operador:''):m.t==='ent'?(m.a.fornecedor||'Entrada')+(m.a.nf?' · NF '+m.a.nf:''):'—';
+function layoutRel(){
+  const t=filtro.tipo;
+  if(t==='ent')return{sub:'Relatório de entradas',cols:[cDat,cHora,{t:'Fazenda',x:196,w:100,g:m=>m.a.fazenda},{t:'Fornecedor',x:300,w:135,b:1,g:m=>m.a.fornecedor||'—'},{t:'Nº NF',x:440,w:60,g:m=>m.a.nf||'—'},{t:'Litros',x:575,dir:1,b:1,g:m=>fmtL(m.q)},{t:'Valor total',x:705,dir:1,n:1,g:m=>Number(m.a.valorTotal)?fmtR(m.a.valorTotal):'—'},{t:'R$/L',x:775,dir:1,n:1,g:m=>Number(m.a.valorLitro)?txtBR(m.a.valorLitro,2):'—'}],obsX:795,obsW:170,somaX:[575],nome:['entrada','entradas']};
+  if(t==='sai')return{sub:'Relatório de saídas (abastecimentos)',cols:[cDat,cHora,{t:'Fazenda',x:196,w:110,g:m=>m.a.fazenda},{t:'Operador',x:310,w:120,g:m=>m.a.operador||'—'},{t:'Equipamento',x:434,w:150,b:1,g:m=>m.t==='sai'?'SAÍDA MANUAL':m.a.equipamento},{t:'Litros',x:680,dir:1,b:1,g:m=>fmtL(-m.q)}],obsX:705,obsW:260,somaX:[680],nome:['saída','saídas']};
+  return{sub:'Relatório de movimentações (entradas e saídas)',cols:[cDat,cHora,{t:'Fazenda',x:196,w:100,g:m=>m.a.fazenda},{t:'Tipo',x:300,w:100,g:m=>m.t==='abs'?'Abastecimento':m.t==='ent'?'Entrada':'Saída manual'},{t:'Descrição',x:405,w:200,b:1,g:descMov},{t:'Entrada',x:665,dir:1,b:1,g:m=>m.q>0?'+'+fmtL(m.q):''},{t:'Saída',x:745,dir:1,b:1,g:m=>m.q<0?'−'+fmtL(-m.q):''}],obsX:765,obsW:200,somaX:[665,745],nome:['movimentação','movimentações']};
+}
 function itensRel(l,imgs){
-  const it=[];let dia=null,tot=0;
-  const soma={};l.forEach(a=>soma[a.data]=(soma[a.data]||0)+Number(a.litros||0));
-  for(const a of l){if(a.data!==dia){dia=a.data;it.push({k:'dia',d:dia,s:soma[dia]})}it.push({k:'reg',a,imgs:imgs&&imgs[a.id]});tot+=Number(a.litros||0)}
+  const it=[],so={},tot={e:0,s:0};let dia=null;
+  l.forEach(m=>{const o=so[m.a.data]=so[m.a.data]||{e:0,s:0};if(m.q>0){o.e+=m.q;tot.e+=m.q}else{o.s-=m.q;tot.s-=m.q}});
+  for(const m of l){if(m.a.data!==dia){dia=m.a.data;it.push({k:'dia',d:dia,s:so[dia]})}it.push({k:'reg',m,a:m.a,imgs:imgs&&imgs[m.a.id]})}
   it.push({k:'total',s:tot,n:l.length});return it;
 }
 const cabAlt=p=>p?262:96;
@@ -1143,7 +1191,7 @@ const MED=document.createElement('canvas').getContext('2d');
 function quebrar(c,t,w){t=String(t||'').trim();if(!t)return[];const out=[];
   for(const par of t.split(/\n/)){let lin='';for(const pal of par.split(/\s+/)){const tt=lin?lin+' '+pal:pal;
     if(c.measureText(tt).width>w&&lin){out.push(lin);lin=pal}else lin=tt}if(lin)out.push(lin)}return out}
-function obsLinhas(a){MED.font='italic 14px Arial,Helvetica,sans-serif';return quebrar(MED,a.obs,260)}
+function obsLinhas(a){MED.font='italic 14px Arial,Helvetica,sans-serif';return quebrar(MED,a.obs,layoutRel().obsW)}
 const FH=200;
 const alt=i=>i.k==='reg'?Math.max(40,obsLinhas(i.a).length*18+16)+(i.imgs&&i.imgs.length?FH+12:0):ALT[i.k];
 function paginar(it,pageH){
@@ -1162,11 +1210,10 @@ function desenharPagina(itens,l,primeira,pageH,pag,totPag){
     const lg=$('logoRel');
     if(lg&&lg.naturalWidth){const lh=70,lw=lg.naturalWidth*lh/lg.naturalHeight;c.drawImage(lg,RW-40-lw,28,lw,lh)}
     c.fillStyle=NAVY;c.font=`bold 32px ${F}`;c.fillText('Abastecimentos da Frota',40,68);
-    c.fillStyle=CINZA;c.font=`17px ${F}`;c.fillText('Relatório de abastecimentos',40,96);
+    const LY=layoutRel();c.fillStyle=CINZA;c.font=`17px ${F}`;c.fillText(LY.sub,40,96);
     c.fillStyle=LIMA;c.fillRect(40,114,RW-80,4);
     c.fillStyle=NAVY;c.font=`bold 18px ${F}`;c.fillText(cortar(c,descFiltro(),RW-80),40,148);
-    const tot=l.reduce((s,a)=>s+Number(a.litros||0),0);
-    const st=[['ABASTECIMENTOS',String(l.length)],['TOTAL DE LITROS',fmtL(tot)+' L'],['MÉDIA POR ABASTECIMENTO',l.length?fmtL(tot/l.length)+' L':'—']];
+    const st=statsMov(l).map(x=>[x[0].toUpperCase(),x[1]]);
     const bw=(RW-80-2*14)/3;
     st.forEach((s,i)=>{const x=40+i*(bw+14);c.fillStyle='#e4f0f5';c.beginPath();c.roundRect?c.roundRect(x,166,bw,72,10):c.rect(x,166,bw,72);c.fill();
       c.fillStyle=CINZA;c.font=`bold 13px ${F}`;c.fillText(s[0],x+14,190);c.fillStyle=NAVY;c.font=`bold 30px ${F}`;c.fillText(s[1],x+14,226)});
@@ -1175,21 +1222,23 @@ function desenharPagina(itens,l,primeira,pageH,pag,totPag){
     c.fillStyle=NAVY;c.font=`bold 22px ${F}`;c.fillText('Abastecimentos da Frota (continuação)',40,52);
     c.fillStyle=LIMA;c.fillRect(40,68,RW-80,4);y=cabAlt(false);
   }
+  const L=layoutRel(),todos=L.somaX.length>1,sx=L.somaX[0];
   c.fillStyle=NAVY;c.fillRect(30,y,RW-60,40);c.fillStyle='#fff';c.font=`bold 15px ${F}`;
-  COLX.forEach(k=>{c.textAlign=k.dir?'right':'left';c.fillText(k.t.toUpperCase(),k.x,y+26)});c.textAlign='left';y+=40;
+  [...L.cols,{t:'Observação',x:L.obsX}].forEach(k=>{c.textAlign=k.dir?'right':'left';c.fillText(k.t.toUpperCase(),k.x,y+26)});c.textAlign='left';y+=40;
   for(const i of itens){
     if(i.k==='dia'){c.fillStyle='#e4f0f5';c.fillRect(30,y,RW-60,ALT.dia);c.fillStyle=NAVY;c.font=`bold 16px ${F}`;
-      c.fillText(nomeDia(i.d)+', '+fmtData(i.d),40,y+25);c.textAlign='right';c.fillText(fmtL(i.s)+' L',680,y+25);c.textAlign='left'}
-    else if(i.k==='reg'){const a=i.a;c.fillStyle='#11253d';c.font=`15px ${F}`;
-      c.fillText(fmtData(a.data),40,y+26);c.fillText(fmtHora(a.registradoEm),145,y+26);
-      c.fillText(cortar(c,a.fazenda,110),196,y+26);c.fillText(cortar(c,a.operador||'—',120),310,y+26);c.font=`bold 16px ${F}`;c.fillText(cortar(c,a.equipamento,150),434,y+26);
-      c.font=`italic 14px ${F}`;c.fillStyle=CINZA;obsLinhas(a).forEach((t,k)=>c.fillText(t,705,y+26+k*18));
-      c.fillStyle=NAVY;c.font=`bold 17px ${F}`;c.textAlign='right';c.fillText(fmtL(a.litros),680,y+26);c.textAlign='left';
+      c.fillText(nomeDia(i.d)+', '+fmtData(i.d),40,y+25);c.textAlign='right';
+      if(todos){if(i.s.e)c.fillText('+'+fmtL(i.s.e),L.somaX[0],y+25);if(i.s.s)c.fillText('−'+fmtL(i.s.s),L.somaX[1],y+25)}else c.fillText(fmtL(i.s.e+i.s.s)+' L',sx,y+25);c.textAlign='left'}
+    else if(i.k==='reg'){const a=i.a;
+      L.cols.forEach(k=>{c.fillStyle=k.dir?NAVY:'#11253d';c.font=k.n?`15px ${F}`:k.dir?`bold 17px ${F}`:k.b?`bold 16px ${F}`:`15px ${F}`;c.textAlign=k.dir?'right':'left';
+        if(k.dir&&todos&&i.m.q>0)c.fillStyle='#1f8f4e';c.fillText(k.w?cortar(c,k.g(i.m),k.w):k.g(i.m),k.x,y+26)});c.textAlign='left';
+      c.font=`italic 14px ${F}`;c.fillStyle=CINZA;obsLinhas(a).forEach((t,k)=>c.fillText(t,L.obsX,y+26+k*18));
       if(i.imgs&&i.imgs.length){const y0=y+Math.max(40,obsLinhas(a).length*18+16);let x=196;
         const q=i.imgs.length,lim=(RW-30-196-12*(q-1))/q;for(const im of i.imgs){let w=Math.min(360,lim,im.width*FH/im.height),h=w*im.height/im.width;if(h>FH){h=FH;w=FH*im.width/im.height}c.drawImage(im,x,y0,w,h);c.strokeStyle='#dde3ea';c.strokeRect(x,y0,w,h);x+=w+12}}
       c.fillStyle='#dde3ea';c.fillRect(30,y+alt(i)-1,RW-60,1)}
     else{c.fillStyle=NAVY;c.fillRect(30,y+8,RW-60,ALT.total-8);c.fillStyle='#fff';c.font=`bold 19px ${F}`;
-      c.fillText(`TOTAL · ${i.n} abastecimento${i.n===1?'':'s'}`,40,y+38);c.textAlign='right';c.fillStyle='#9fd6ea';c.fillText(fmtL(i.s)+' L',680,y+38);c.textAlign='left'}
+      c.fillText(`TOTAL · ${i.n} ${L.nome[i.n===1?0:1]}`,40,y+38);c.textAlign='right';c.fillStyle='#9fd6ea';
+      if(todos){c.fillText('+'+fmtL(i.s.e),L.somaX[0],y+38);c.fillText('−'+fmtL(i.s.s),L.somaX[1],y+38)}else c.fillText(fmtL(i.s.e+i.s.s)+' L',sx,y+38);c.textAlign='left'}
     y+=alt(i);
   }
   const ag=new Date();c.fillStyle=CINZA;c.font=`13px ${F}`;
@@ -1252,15 +1301,40 @@ function sheetXml(rows,widths){
   }).join('')+'</row>').join('');
   return`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>${cols}<sheetData>${body}</sheetData></worksheet>`;
 }
-function gerarXlsx(l){
-  const H=t=>({v:t,s:1}),T=t=>({v:t,s:6});
-  const dSer=k=>{const[y,m,d]=k.split('-').map(Number);return(Date.UTC(y,m-1,d)-Date.UTC(1899,11,30))/86400000};
-  const hSer=iso=>{const d=new Date(iso);return isNaN(d)?'':(d.getHours()*60+d.getMinutes())/1440};
-  const tot=l.reduce((s,a)=>s+Number(a.litros||0),0);
+const xH=t=>({v:t,s:1}),xTo=t=>({v:t,s:6});
+const dSer=k=>{const[y,m,d]=k.split('-').map(Number);return(Date.UTC(y,m-1,d)-Date.UTC(1899,11,30))/86400000};
+const hSer=iso=>{const d=new Date(iso);return isNaN(d)?'':(d.getHours()*60+d.getMinutes())/1440};
+const xHora=iso=>{const h=hSer(iso);return h===''?{v:''}:{v:h,s:3}};
+/* Excel das Entradas */
+function wsEnt(l){const H=xH,T=xTo;
+  const r=[[H('Data'),H('Hora'),H('Fazenda'),H('Fornecedor'),H('Nº NF'),H('Litros'),H('Valor total (R$)'),H('Valor do litro (R$)'),H('Observação')]];
+  l.forEach(m=>{const a=m.a;r.push([{v:dSer(a.data),s:2},xHora(a.registradoEm),{v:a.fazenda},{v:a.fornecedor||''},{v:a.nf||''},{v:m.q,s:4},Number(a.valorTotal)?{v:Number(a.valorTotal),s:9}:{v:''},Number(a.valorLitro)?{v:Number(a.valorLitro),s:9}:{v:''},{v:a.obs||''}])});
+  const n=l.length+1,lt=l.reduce((s,m)=>s+m.q,0),vt=l.reduce((s,m)=>s+(Number(m.a.valorTotal)||0),0);
+  r.push([T('TOTAL'),T(''),T(''),T(l.length+' notas'),T(''),{f:`SUM(F2:F${n})`,v:lt,s:5},{f:`SUM(G2:G${n})`,v:vt,s:10},T(''),T('')]);
+  const fz=new Map();l.forEach(m=>{if(!fz.has(m.a.fazendaId))fz.set(m.a.fazendaId,{f:m.a.fazenda,n:0,lt:0,v:0});const o=fz.get(m.a.fazendaId);o.n++;o.lt+=m.q;o.v+=Number(m.a.valorTotal)||0});
+  const r2=[[H('Fazenda'),H('Notas'),H('Litros'),H('Valor total (R$)')]];[...fz.values()].forEach(o=>r2.push([{v:o.f},{v:o.n,s:7},{v:o.lt,s:4},{v:o.v,s:9}]));
+  return[['Entradas',r,[12,8,16,22,10,11,15,15,36]],['Por fazenda',r2,[20,10,12,16]]];
+}
+/* Excel de Todos: entradas e saídas */
+function wsTodos(l){const H=xH,T=xTo;
+  const r=[[H('Data'),H('Hora'),H('Fazenda'),H('Tipo'),H('Descrição'),H('Entrada (L)'),H('Saída (L)'),H('Observação')]];
+  l.forEach(m=>{const a=m.a;r.push([{v:dSer(a.data),s:2},xHora(a.registradoEm),{v:a.fazenda},{v:m.t==='abs'?'Abastecimento':m.t==='ent'?'Entrada':'Saída manual'},{v:descMov(m)},m.q>0?{v:m.q,s:4}:{v:''},m.q<0?{v:-m.q,s:4}:{v:''},{v:a.obs||''}])});
+  const n=l.length+1,e=l.filter(m=>m.q>0).reduce((s,m)=>s+m.q,0),sa=-l.filter(m=>m.q<0).reduce((s,m)=>s+m.q,0);
+  r.push([T('TOTAL'),T(''),T(''),T(''),T(l.length+' movimentações'),{f:`SUM(F2:F${n})`,v:e,s:5},{f:`SUM(G2:G${n})`,v:sa,s:5},T('')]);
+  const fz=new Map();l.forEach(m=>{if(!fz.has(m.a.fazendaId))fz.set(m.a.fazendaId,{f:m.a.fazenda,e:0,s:0});const o=fz.get(m.a.fazendaId);if(m.q>0)o.e+=m.q;else o.s-=m.q});
+  const r2=[[H('Fazenda'),H('Entradas (L)'),H('Saídas (L)'),H('Saldo do período (L)')]];[...fz.values()].forEach((o,i)=>r2.push([{v:o.f},{v:o.e,s:4},{v:o.s,s:4},{f:`B${i+2}-C${i+2}`,v:o.e-o.s,s:4}]));
+  return[['Movimentações',r,[12,8,16,15,30,12,12,36]],['Por fazenda',r2,[20,14,14,18]]];
+}
+function gerarXlsx(l0){
+  const ws=filtro.tipo==='ent'?wsEnt(l0):filtro.tipo==='todos'?wsTodos(l0):wsSai(l0.map(m=>({...m.a,equipId:m.t==='sai'?'manual':m.a.equipId,equipamento:m.t==='sai'?'SAÍDA MANUAL':m.a.equipamento,operador:m.a.operador||'',litros:-m.q})));
+  return montarXlsx(ws);
+}
+function wsSai(l){const H=xH,T=xTo;
   // Aba 1: todos os abastecimentos
+  const tot=l.reduce((s,a)=>s+Number(a.litros||0),0);
   const r1=[[H('Data'),H('Hora'),H('Fazenda'),H('Operador'),H('Equipamento'),H('Litros'),H('Observação'),H('Fotos')]];
   l.forEach(a=>{const h=hSer(a.registradoEm),q=qtdFotos(a);r1.push([{v:dSer(a.data),s:2},h===''?{v:''}:{v:h,s:3},{v:a.fazenda},{v:a.operador||''},{v:a.equipamento},{v:Number(a.litros)||0,s:4},{v:a.obs||''},{v:q?q+(q>1?' fotos':' foto'):''}])});
-  r1.push([T('TOTAL'),T(''),T(''),T(''),T(l.length+' abastecimentos'),{f:`SUM(F2:F${l.length+1})`,v:tot,s:5},T(''),T('')]);
+  r1.push([T('TOTAL'),T(''),T(''),T(''),T(l.length+' saídas'),{f:`SUM(F2:F${l.length+1})`,v:tot,s:5},T(''),T('')]);
   // Aba 2: por equipamento (na fazenda onde abasteceu)
   const m=new Map();l.forEach(a=>{const k=a.fazendaId+'|'+(String(a.equipId).startsWith('outro:')?a.equipamento:a.equipId);if(!m.has(k))m.set(k,{f:a.fazenda,e:a.equipamento,n:0,lt:0});const o=m.get(k);o.n++;o.lt+=Number(a.litros||0)});
   const eqs=[...m.values()].sort((a,b)=>String(a.f).localeCompare(b.f)||String(a.e).localeCompare(b.e,'pt-BR',{numeric:true}));
@@ -1275,13 +1349,16 @@ function gerarXlsx(l){
   const dd=new Map();l.forEach(a=>{if(!dd.has(a.data))dd.set(a.data,{n:0,lt:0});const o=dd.get(a.data);o.n++;o.lt+=Number(a.litros||0)});
   const r4=[[H('Data'),H('Abastecimentos'),H('Litros')]];[...dd.entries()].sort().forEach(([k,o])=>r4.push([{v:dSer(k),s:2},{v:o.n,s:7},{v:o.lt,s:4}]));
   const L4=dd.size+1;r4.push([T('TOTAL'),{f:`SUM(B2:B${L4})`,v:l.length,s:8},{f:`SUM(C2:C${L4})`,v:tot,s:5}]);
+  return[['Saídas',r1,[12,8,18,18,20,11,40,9]],['Por equipamento',r2,[18,20,15,12,11]],['Por fazenda',r3,[20,15,12]],['Por dia',r4,[12,15,12]]];
+}
+function montarXlsx(ws){
   const styles=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-<numFmts count="3"><numFmt numFmtId="164" formatCode="dd/mm/yyyy"/><numFmt numFmtId="165" formatCode="hh:mm"/><numFmt numFmtId="166" formatCode="#,##0"/></numFmts>
+<numFmts count="4"><numFmt numFmtId="164" formatCode="dd/mm/yyyy"/><numFmt numFmtId="165" formatCode="hh:mm"/><numFmt numFmtId="166" formatCode="#,##0"/><numFmt numFmtId="167" formatCode="#,##0.00"/></numFmts>
 <fonts count="3"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts>
 <fills count="4"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF0C465F"/><bgColor indexed="64"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FFE4F0F5"/><bgColor indexed="64"/></patternFill></fill></fills>
 <borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders>
 <cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>
-<cellXfs count="9">
+<cellXfs count="11">
 <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>
 <xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"><alignment horizontal="center" wrapText="1"/></xf>
 <xf numFmtId="164" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/>
@@ -1291,8 +1368,9 @@ function gerarXlsx(l){
 <xf numFmtId="0" fontId="2" fillId="3" borderId="0" xfId="0" applyFont="1" applyFill="1"/>
 <xf numFmtId="1" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/>
 <xf numFmtId="1" fontId="2" fillId="3" borderId="0" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1"/>
+<xf numFmtId="167" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/>
+<xf numFmtId="167" fontId="2" fillId="3" borderId="0" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1"/>
 </cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`;
-  const ws=[['Abastecimentos',r1,[12,8,18,18,20,11,40,9]],['Por equipamento',r2,[18,20,15,12,11]],['Por fazenda',r3,[20,15,12]],['Por dia',r4,[12,15,12]]];
   const ct=ws.map((w,i)=>`<Override PartName="/xl/worksheets/sheet${i+1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join('');
   return zip([
     ['[Content_Types].xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>${ct}</Types>`],
@@ -1313,7 +1391,8 @@ async function exportar(tipo){
   const l=filtrados();if(!l.length){toast('Nada para exportar');return}
   try{
     let imgs=null;
-    if(tipo!=='xls'&&$('hComFotos').checked&&l.some(qtdFotos)){toast('Preparando as fotos…');const r=await carregarImgs(l);imgs=r.m;if(r.falta)toast(`${r.falta} foto(s) não carregaram (sem internet)`)}
+    const la=l.filter(m=>m.t==='abs').map(m=>m.a);
+    if(tipo!=='xls'&&filtro.tipo!=='ent'&&$('hComFotos').checked&&la.some(qtdFotos)){toast('Preparando as fotos…');const r=await carregarImgs(la);imgs=r.m;if(r.falta)toast(`${r.falta} foto(s) não carregaram (sem internet)`)}
     if(tipo==='pdf')await compartilharArquivo(await gerarPdf(l,imgs),nomeArq(l,'pdf'),'application/pdf');
     if(tipo==='img')await compartilharArquivo(await gerarFoto(l,imgs),nomeArq(l,'jpg'),'image/jpeg');
     if(tipo==='xls')await compartilharArquivo(gerarXlsx(l),nomeArq(l,'xlsx'),XT);
@@ -1491,7 +1570,7 @@ window.addEventListener('online',carregar);
 setInterval(()=>{if(document.visibilityState==='visible')carregar()},60000);
 
 /* ---------- Início ---------- */
-const VERSAO='17';
+const VERSAO='18';
 function marcaAtualizado(d){if(d)gravar('ab_sync',d);const x=ler('ab_sync',null);const t=x?new Date(x):new Date();
   $('hoje').textContent=`Atualizado ${String(t.getDate()).padStart(2,'0')}/${String(t.getMonth()+1).padStart(2,'0')} às ${fmtHora(t.toISOString())} – v${VERSAO}`}
 marcaAtualizado();
