@@ -169,6 +169,8 @@ input[type=date]::-webkit-date-and-time-value{text-align:center;margin:0}
 .tecAcoes1 button.tecOk{background:#1f8f4e;border-color:#1f8f4e;color:#fff;font-size:1.3rem;height:52px}
 button.camBtn{font-size:1.2rem;padding:16px}
 .enCampos{display:flex;flex-direction:column;gap:14px}
+.subTit{padding:8px 12px 4px;border-top:2px solid var(--line);font-size:.8rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);background:#fafbf8}
+.escolha.op button.sel{background:#3d84c6;border-color:#3d84c6;color:#fff}
 .camLinha{display:flex;gap:8px;align-items:stretch}.camLinha .camBtn{flex:1;min-width:0}
 .galBtn{position:relative;flex:none;width:76px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;margin:0;border:2px solid var(--line);border-radius:10px;background:#fff;font-size:1.4rem;cursor:pointer;text-transform:none;letter-spacing:0;color:var(--fg)}
 .galBtn span{font-size:.72rem;font-weight:700}.galBtn input{position:absolute;inset:0;opacity:0;cursor:pointer}
@@ -266,6 +268,10 @@ button.cancelarBtn{background:var(--bad);border-color:var(--bad);color:#fff;font
         <div class="escolha" id="abFaz"></div>
       </div>
       <div class="estAtual" id="abEstoque" hidden></div>
+      <div class="passo" id="abOpBox" hidden>
+        <label>Operador</label>
+        <div class="escolha op" id="abOp"></div>
+      </div>
       <div class="passo" id="abEqBox" hidden>
         <label>Equipamento</label>
         <div class="escolha eq" id="abEq"></div>
@@ -445,6 +451,8 @@ cad.mov=cad.mov||[];
 
 const fazPorId=id=>cad.fazendas.find(f=>f.id===id);
 const eqPorId=id=>cad.equipamentos.find(e=>e.id===id);
+const opsDaFaz=fid=>(cad.operadores||[]).filter(o=>o.fazendaId===fid&&!o.inativo);
+const opPorId=id=>(cad.operadores||[]).find(o=>o.id===id);
 const eqsDaFaz=fid=>cad.equipamentos.filter(e=>e.fazendaId===fid&&!e.inativo);
 
 function toast(t){const el=$('toast');el.textContent=t;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>el.hidden=true,2600)}
@@ -488,7 +496,7 @@ function slotsFotos(el,lista,mudou){
 // coloca na fila as fotos que mudaram
 function filaFotos(id,antes,depois,tab){
   for(let n=0;n<Math.max((antes||[]).length,(depois||[]).length);n++){const a=antes&&antes[n],d=depois&&depois[n];
-    if((a&&a.k)!==(d&&d.k))fila.push({acao:'foto',dados:{id,n,k:d?d.k:null,tab:tab||'abs'}})}
+    if(((a&&a.k)||null)!==((d&&d.k)||null))fila.push({acao:'foto',dados:{id,n,k:d?d.k:null,tab:tab||'abs'}})}
 }
 
 /* ---------- Navegação ---------- */
@@ -504,7 +512,7 @@ function ir(t){
 /* toda vez que entra numa tela ela abre limpa (os registros recentes continuam) */
 function limparTela(t){
   document.querySelectorAll('.fundo').forEach(x=>x.remove());
-  if(t==='abast'){form.data=chaveDia();form.faz=null;form.eq=null;form.fotos=[null,null,null,null];$('abLitros').value='';$('abLitros').dataset.auto='';$('abObs').value='';$('abLeit').hidden=true}
+  if(t==='abast'){form.data=chaveDia();form.faz=null;form.op=null;form.eq=null;form.fotos=[null,null,null,null];$('abLitros').value='';$('abLitros').dataset.auto='';$('abObs').value='';$('abLeit').hidden=true}
   if(t==='ent'){fe.faz=null;fe.fotos=[null,null];['enForn','enNF','enLitros','enTotal','enVL','enObs'].forEach(i=>$(i).value='');$('enData').value=chaveDia();$('enLeitura').hidden=true}
   if(t==='hist'){aplicaPeriodo('7');filtro.faz='';filtro.off=new Set();$('hComFotos').checked=false}
   if(t==='est'){fest.faz='';fest.per='30'}
@@ -551,9 +559,16 @@ function renderAbast(){
   const outra=form.data!==chaveDia();
   $('abDataLinha').classList.toggle('outra',outra);$('abHoje').hidden=!outra;
   $('abFaz').innerHTML=cad.fazendas.map(f=>`<button data-f="${f.id}" class="${form.faz===f.id?'sel':''}">${esc(f.nome)}</button>`).join('')||'<div class="vazio" style="grid-column:1/-1">Nenhuma fazenda cadastrada. Entre em ⚙️ Configurações.</div>';
-  $('abFaz').querySelectorAll('button').forEach(b=>b.onclick=()=>{form.faz=b.dataset.f;form.eq=null;renderAbast()});
-  $('abEqBox').hidden=!form.faz;
+  $('abFaz').querySelectorAll('button').forEach(b=>b.onclick=()=>{if(form.faz!==b.dataset.f){form.op=null;form.eq=null}form.faz=b.dataset.f;renderAbast()});
+  const ops=form.faz?opsDaFaz(form.faz):[];
+  $('abOpBox').hidden=!form.faz;
   if(form.faz){
+    $('abOp').innerHTML=ops.map(o=>`<button data-o="${o.id}" class="${form.op===o.id?'sel':''}">${esc(o.nome)}</button>`).join('')||'<div class="vazio" style="grid-column:1/-1">Nenhum operador nesta fazenda. Cadastre em Gestão › Configurações.</div>';
+    $('abOp').querySelectorAll('button').forEach(b=>b.onclick=()=>{form.op=b.dataset.o;renderAbast()});
+  }
+  const opOk=form.faz&&(form.op||!ops.length);
+  $('abEqBox').hidden=!opOk;
+  if(opOk){
     const lista=eqsDaFaz(form.faz);
     $('abEq').innerHTML=lista.map(e=>`<button data-e="${e.id}" class="${form.eq===e.id?'sel':''}">${esc(e.nome)}</button>`).join('')||'<div class="vazio" style="grid-column:1/-1">Nenhum equipamento nesta fazenda. Cadastre em ⚙️ Configurações.</div>';
     $('abEq').querySelectorAll('button').forEach(b=>b.onclick=()=>{form.eq=b.dataset.e;renderAbast();setTimeout(()=>$('abLtBox').scrollIntoView({behavior:'smooth',block:'start'}),50)});
@@ -571,7 +586,8 @@ $('abRegistrar').onclick=()=>{
   const lt=parseInt(String($('abLitros').value).replace(/\D/g,''),10);
   if(!(lt>0)){toast('Informe os litros');$('abLitros').focus();return}
   const f=fazPorId(form.faz),e=eqPorId(form.eq);
-  const rec={id:uid(),data:form.data,fazendaId:f.id,fazenda:f.nome,equipId:e.id,equipamento:e.nome,litros:lt,obs:$('abObs').value.trim(),registradoEm:new Date().toISOString(),aparelho:disp,fotos:[null,null,null,null]};
+  const op=form.op?opPorId(form.op):null;
+  const rec={id:uid(),data:form.data,fazendaId:f.id,fazenda:f.nome,equipId:e.id,equipamento:e.nome,operadorId:op?op.id:'',operador:op?op.nome:'',litros:lt,obs:$('abObs').value.trim(),registradoEm:new Date().toISOString(),aparelho:disp,fotos:[null,null,null,null]};
   const fts=form.fotos.slice();rec.fotos=fts.map(f=>f?{k:f.k,arq:null}:null);
   abs.push(rec);gravar(K.abs,abs);fila.push({acao:'abastecer',dados:{...rec,fotos:[]}});filaFotos(rec.id,[],rec.fotos);gravar(K.fila,fila);enviarFila(); // vai direto para o histórico
   pend.unshift({id:rec.id,registradoEm:rec.registradoEm});gravar(K.pend,pend);
@@ -786,7 +802,7 @@ function renderHist(){
   for(const a of l){
     if(a.data!==dia){dia=a.data;html+=`<div class="dia"><span>${nomeDia(dia)}, ${fmtData(dia)}</span><span class="num">${fmtL(somaDia[dia])} L</span></div>`}
     const naFila=fila.some(f=>f.dados&&f.dados.id===a.id)&&!enviando;
-    html+=`<button class="reg" data-id="${a.id}"><div><div class="eqn">${esc(a.equipamento)}${naFila?'<span class="tag">aguardando internet</span>':''}</div><div class="faz">${esc(a.fazenda)} · ${fmtHora(a.registradoEm)}${a.alteradoEm?' · alterado':''}${qtdFotos(a)?' · 📷 '+qtdFotos(a):''}</div>${a.obs?`<div class="obs">${esc(a.obs)}</div>`:''}</div><div class="lt">${fmtL(a.litros)} L</div></button>`;
+    html+=`<button class="reg" data-id="${a.id}"><div><div class="eqn">${esc(a.equipamento)}${naFila?'<span class="tag">aguardando internet</span>':''}</div><div class="faz">${esc(a.fazenda)}${a.operador?' · 👤 '+esc(a.operador):''} · ${fmtHora(a.registradoEm)}${a.alteradoEm?' · alterado':''}${qtdFotos(a)?' · 📷 '+qtdFotos(a):''}</div>${a.obs?`<div class="obs">${esc(a.obs)}</div>`:''}</div><div class="lt">${fmtL(a.litros)} L</div></button>`;
   }
   $('hLista').innerHTML=html;
   $('hLista').querySelectorAll('.reg').forEach(b=>b.onclick=()=>detalhes(abs.find(a=>a.id===b.dataset.id)));
@@ -795,7 +811,7 @@ function renderHist(){
 function detalhes(a){
   if(!a)return;const fs=(a.fotos||[]).filter(Boolean);
   janela(`<h3>${esc(a.equipamento)} · ${fmtL(a.litros)} L</h3>
-    <dl class="det"><dt>Fazenda</dt><dd>${esc(a.fazenda)}</dd><dt>Data</dt><dd>${nomeDia(a.data)}, ${fmtData(a.data)}</dd><dt>Lançado</dt><dd>${fmtData(chaveDia(new Date(a.registradoEm)))} ${fmtHora(a.registradoEm)}</dd>${a.alteradoEm?`<dt>Alterado</dt><dd>${fmtData(chaveDia(new Date(a.alteradoEm)))} ${fmtHora(a.alteradoEm)}</dd>`:''}<dt>Observação</dt><dd style="font-weight:400">${esc(a.obs)||'—'}</dd></dl>
+    <dl class="det"><dt>Fazenda</dt><dd>${esc(a.fazenda)}</dd><dt>Operador</dt><dd>${esc(a.operador)||'—'}</dd><dt>Data</dt><dd>${nomeDia(a.data)}, ${fmtData(a.data)}</dd><dt>Lançado</dt><dd>${fmtData(chaveDia(new Date(a.registradoEm)))} ${fmtHora(a.registradoEm)}</dd>${a.alteradoEm?`<dt>Alterado</dt><dd>${fmtData(chaveDia(new Date(a.alteradoEm)))} ${fmtHora(a.alteradoEm)}</dd>`:''}<dt>Observação</dt><dd style="font-weight:400">${esc(a.obs)||'—'}</dd></dl>
     ${fs.length?`<div class="galeria">${fs.map((_,n)=>`<div class="carregando" data-g="${n}">Carregando foto ${n+1}…</div>`).join('')}</div>`:'<p class="note">Sem fotos.</p>'}
     <div class="row"><button id="dF">Fechar</button><button class="primary" id="dE">✎ Editar / excluir</button></div>`,(j,fechar)=>{
     fs.forEach((sl,n)=>fotoURL(sl).then(u=>{const d=j.querySelector(`[data-g="${n}"]`);if(!d)return;
@@ -1042,7 +1058,7 @@ function quebrar(c,t,w){t=String(t||'').trim();if(!t)return[];const out=[];
     if(c.measureText(tt).width>w&&lin){out.push(lin);lin=pal}else lin=tt}if(lin)out.push(lin)}return out}
 function obsLinhas(a){MED.font='italic 14px Arial,Helvetica,sans-serif';return quebrar(MED,a.obs,265)}
 const FH=200;
-const alt=i=>i.k==='reg'?Math.max(40,obsLinhas(i.a).length*18+16)+(i.imgs&&i.imgs.length?FH+12:0):ALT[i.k];
+const alt=i=>i.k==='reg'?Math.max(i.a.operador?54:40,obsLinhas(i.a).length*18+16)+(i.imgs&&i.imgs.length?FH+12:0):ALT[i.k];
 function paginar(it,pageH){
   const pgs=[];let cur=[],h=cabAlt(true)+40;
   for(const i of it){const a=alt(i);if(pageH&&h+a>pageH-60&&cur.length){pgs.push(cur);cur=[];h=cabAlt(false)+40}cur.push(i);h+=a}
@@ -1079,10 +1095,10 @@ function desenharPagina(itens,l,primeira,pageH,pag,totPag){
       c.fillText(nomeDia(i.d)+', '+fmtData(i.d),40,y+25);c.textAlign='right';c.fillText(fmtL(i.s)+' L',960,y+25);c.textAlign='left'}
     else if(i.k==='reg'){const a=i.a;c.fillStyle='#11253d';c.font=`15px ${F}`;
       c.fillText(fmtData(a.data),40,y+26);c.fillText(fmtHora(a.registradoEm),145,y+26);
-      c.fillText(cortar(c,a.fazenda,175),215,y+26);c.font=`bold 16px ${F}`;c.fillText(cortar(c,a.equipamento,205),395,y+26);
+      c.fillText(cortar(c,a.fazenda,175),215,y+26);c.font=`bold 16px ${F}`;c.fillText(cortar(c,a.equipamento,205),395,y+26);if(a.operador){c.font=`13px ${F}`;c.fillStyle=CINZA;c.fillText(cortar(c,'👤 '+a.operador,205),395,y+44);c.fillStyle=NAVY}
       c.font=`italic 14px ${F}`;c.fillStyle=CINZA;obsLinhas(a).forEach((t,k)=>c.fillText(t,605,y+26+k*18));
       c.fillStyle=NAVY;c.font=`bold 17px ${F}`;c.textAlign='right';c.fillText(fmtL(a.litros),960,y+26);c.textAlign='left';
-      if(i.imgs&&i.imgs.length){const y0=y+Math.max(40,obsLinhas(a).length*18+16);let x=215;
+      if(i.imgs&&i.imgs.length){const y0=y+Math.max(a.operador?54:40,obsLinhas(a).length*18+16);let x=215;
         const q=i.imgs.length,lim=(RW-30-215-12*(q-1))/q;for(const im of i.imgs){let w=Math.min(360,lim,im.width*FH/im.height),h=w*im.height/im.width;if(h>FH){h=FH;w=FH*im.width/im.height}c.drawImage(im,x,y0,w,h);c.strokeStyle='#dde3ea';c.strokeRect(x,y0,w,h);x+=w+12}}
       c.fillStyle='#dde3ea';c.fillRect(30,y+alt(i)-1,RW-60,1)}
     else{c.fillStyle=NAVY;c.fillRect(30,y+8,RW-60,ALT.total-8);c.fillStyle='#fff';c.font=`bold 19px ${F}`;
@@ -1155,9 +1171,9 @@ function gerarXlsx(l){
   const hSer=iso=>{const d=new Date(iso);return isNaN(d)?'':(d.getHours()*60+d.getMinutes())/1440};
   const tot=l.reduce((s,a)=>s+Number(a.litros||0),0);
   // Aba 1: todos os abastecimentos
-  const r1=[[H('Data'),H('Hora'),H('Fazenda'),H('Equipamento'),H('Litros'),H('Observação'),H('Fotos')]];
-  l.forEach(a=>{const h=hSer(a.registradoEm),q=qtdFotos(a);r1.push([{v:dSer(a.data),s:2},h===''?{v:''}:{v:h,s:3},{v:a.fazenda},{v:a.equipamento},{v:Number(a.litros)||0,s:4},{v:a.obs||''},{v:q?q+(q>1?' fotos':' foto'):''}])});
-  r1.push([T('TOTAL'),T(''),T(''),T(l.length+' abastecimentos'),{f:`SUM(E2:E${l.length+1})`,v:tot,s:5},T(''),T('')]);
+  const r1=[[H('Data'),H('Hora'),H('Fazenda'),H('Equipamento'),H('Operador'),H('Litros'),H('Observação'),H('Fotos')]];
+  l.forEach(a=>{const h=hSer(a.registradoEm),q=qtdFotos(a);r1.push([{v:dSer(a.data),s:2},h===''?{v:''}:{v:h,s:3},{v:a.fazenda},{v:a.equipamento},{v:a.operador||''},{v:Number(a.litros)||0,s:4},{v:a.obs||''},{v:q?q+(q>1?' fotos':' foto'):''}])});
+  r1.push([T('TOTAL'),T(''),T(''),T(l.length+' abastecimentos'),T(''),{f:`SUM(F2:F${l.length+1})`,v:tot,s:5},T(''),T('')]);
   // Aba 2: por equipamento (na fazenda onde abasteceu)
   const m=new Map();l.forEach(a=>{const k=a.fazendaId+'|'+a.equipId;if(!m.has(k))m.set(k,{f:a.fazenda,e:a.equipamento,n:0,lt:0});const o=m.get(k);o.n++;o.lt+=Number(a.litros||0)});
   const eqs=[...m.values()].sort((a,b)=>String(a.f).localeCompare(b.f)||String(a.e).localeCompare(b.e,'pt-BR',{numeric:true}));
@@ -1189,7 +1205,7 @@ function gerarXlsx(l){
 <xf numFmtId="1" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/>
 <xf numFmtId="1" fontId="2" fillId="3" borderId="0" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1"/>
 </cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`;
-  const ws=[['Abastecimentos',r1,[12,8,18,20,11,40,9]],['Por equipamento',r2,[18,20,15,12,11]],['Por fazenda',r3,[20,15,12]],['Por dia',r4,[12,15,12]]];
+  const ws=[['Abastecimentos',r1,[12,8,18,20,18,11,40,9]],['Por equipamento',r2,[18,20,15,12,11]],['Por fazenda',r3,[20,15,12]],['Por dia',r4,[12,15,12]]];
   const ct=ws.map((w,i)=>`<Override PartName="/xl/worksheets/sheet${i+1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join('');
   return zip([
     ['[Content_Types].xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>${ct}</Types>`],
@@ -1235,8 +1251,23 @@ function renderCad(){
     return `<div class="fzBloco"><div class="fzCab"><b>${esc(f.nome)}</b><span><button class="mini" data-rf="${f.id}">✎</button> <button class="mini" data-xf="${f.id}">🗑</button></span></div>
       ${eqs.map(e=>`<div class="eqLinha"><span>${esc(e.nome)}</span><button class="mini" data-mv="${e.id}" title="Mudar de fazenda">⇄ Mudar</button><button class="mini" data-re="${e.id}">✎</button>${temLanc(e.id)?`<button class="mini inativar" data-in="${e.id}">⏸ Inativar</button>`:`<button class="mini danger" data-xe="${e.id}">🗑</button>`}</div>`).join('')||'<div class="eqLinha"><span class="note">Nenhum equipamento ativo</span></div>'}
       ${ina.map(e=>`<div class="eqLinha inativo"><span>${esc(e.nome)} <span class="tag">inativo</span></span><button class="mini" data-at="${e.id}">▶ Reativar</button></div>`).join('')}
-      <div class="addLinha"><input type="text" placeholder="Novo equipamento" data-ni="${f.id}"><button class="lima mini" data-ae="${f.id}">+ Adicionar</button></div></div>`}).join('')||'<div class="vazio">Nenhuma fazenda cadastrada.</div>';
+      <div class="addLinha"><input type="text" placeholder="Novo equipamento" data-ni="${f.id}"><button class="lima mini" data-ae="${f.id}">+ Adicionar</button></div>
+      <div class="subTit">👤 Operadores</div>
+      ${(cad.operadores||[]).filter(o=>o.fazendaId===f.id).map(o=>`<div class="eqLinha ${o.inativo?'inativo':''}"><span>${esc(o.nome)}${o.inativo?' <span class="tag">inativo</span>':''}</span>${o.inativo?`<button class="mini" data-oat="${o.id}">▶ Reativar</button>`:`<button class="mini" data-omv="${o.id}">⇄ Mudar</button><button class="mini" data-ore="${o.id}">✎</button>${opTemLanc(o.id)?`<button class="mini inativar" data-oin="${o.id}">⏸ Inativar</button>`:`<button class="mini danger" data-oxe="${o.id}">🗑</button>`}`}</div>`).join('')||'<div class="eqLinha"><span class="note">Nenhum operador</span></div>'}
+      <div class="addLinha"><input type="text" placeholder="Novo operador" data-noi="${f.id}"><button class="lima mini" data-oae="${f.id}">+ Adicionar</button></div></div>`}).join('')||'<div class="vazio">Nenhuma fazenda cadastrada.</div>';
   const L=$('cadLista');
+  // operadores
+  L.querySelectorAll('[data-oae]').forEach(b=>b.onclick=()=>{const i=L.querySelector(`[data-noi="${b.dataset.oae}"]`);const n=i.value.trim();if(!n){i.focus();return}
+    cad.operadores=cad.operadores||[];cad.operadores.push({id:uid(),nome:n,fazendaId:b.dataset.oae});salvarCad('Operador adicionado')});
+  L.querySelectorAll('[data-noi]').forEach(i=>i.onkeydown=e=>{if(e.key==='Enter')L.querySelector(`[data-oae="${i.dataset.noi}"]`).click()});
+  L.querySelectorAll('[data-ore]').forEach(b=>b.onclick=()=>renomear(opPorId(b.dataset.ore),'operador'));
+  L.querySelectorAll('[data-oxe]').forEach(b=>b.onclick=()=>{const o=opPorId(b.dataset.oxe);if(opTemLanc(o.id)){toast('Este operador tem lançamentos: use Inativar');renderCad();return}
+    confirmar(`Excluir ${o.nome}?`,()=>{cad.operadores=cad.operadores.filter(x=>x.id!==o.id);salvarCad('Operador excluído')})});
+  L.querySelectorAll('[data-oin]').forEach(b=>b.onclick=()=>{const o=opPorId(b.dataset.oin);perguntar(`Inativar ${o.nome}? Ele some do Abastecer, mas os lançamentos continuam no histórico.`,'Sim, inativar','var(--warn)',()=>{o.inativo=true;salvarCad(`${o.nome} inativado`)})});
+  L.querySelectorAll('[data-oat]').forEach(b=>b.onclick=()=>{const o=opPorId(b.dataset.oat);o.inativo=false;salvarCad(`${o.nome} reativado`)});
+  L.querySelectorAll('[data-omv]').forEach(b=>b.onclick=()=>{const o=opPorId(b.dataset.omv);
+    janela(`<h3>Mudar ${esc(o.nome)} de fazenda</h3><p class="note">Os abastecimentos já feitos continuam na fazenda onde foram lançados.</p><div class="escolha" id="jF">${cad.fazendas.filter(f=>f.id!==o.fazendaId).map(f=>`<button data-f="${f.id}">${esc(f.nome)}</button>`).join('')}</div><button id="jC">Cancelar</button>`,(j,fechar)=>{
+      j.querySelector('#jC').onclick=fechar;j.querySelectorAll('[data-f]').forEach(x=>x.onclick=()=>{o.fazendaId=x.dataset.f;fechar();salvarCad(`${o.nome} agora está em ${fazPorId(x.dataset.f).nome}`)})})});
   L.querySelectorAll('[data-ae]').forEach(b=>b.onclick=()=>{const i=L.querySelector(`[data-ni="${b.dataset.ae}"]`);const n=i.value.trim();if(!n){i.focus();return}
     cad.equipamentos.push({id:uid(),nome:n,fazendaId:b.dataset.ae});salvarCad('Equipamento adicionado')});
   L.querySelectorAll('[data-ni]').forEach(i=>i.onkeydown=e=>{if(e.key==='Enter')L.querySelector(`[data-ae="${i.dataset.ni}"]`).click()});
@@ -1257,6 +1288,7 @@ function renderCad(){
   $('movLista').innerHTML=cad.mov.slice(0,30).map(m=>`<div class="mov"><b>${esc(m.equipamento)}</b>: ${esc(m.de)} → ${esc(m.para)} <span class="note">· ${fmtData(chaveDia(new Date(m.em)))} ${fmtHora(m.em)}</span></div>`).join('')||'<p class="note">Nenhuma mudança registrada.</p>';
 }
 const temLanc=id=>abs.some(a=>a.equipId===id);
+const opTemLanc=id=>abs.some(a=>a.operadorId===id);
 function renomear(obj,tipo){
   janela(`<h3>Renomear ${tipo}</h3><input type="text" id="jN" value="${esc(obj.nome)}"><div class="row"><button id="jC">Cancelar</button><button class="primary" id="jO">Salvar</button></div>`,(j,fechar)=>{
     const i=j.querySelector('#jN');setTimeout(()=>i.select(),60);j.querySelector('#jC').onclick=fechar;
@@ -1334,7 +1366,7 @@ window.addEventListener('online',carregar);
 setInterval(()=>{if(document.visibilityState==='visible')carregar()},60000);
 
 /* ---------- Início ---------- */
-const VERSAO='10';
+const VERSAO='11';
 function marcaAtualizado(d){if(d)gravar('ab_sync',d);const x=ler('ab_sync',null);const t=x?new Date(x):new Date();
   $('hoje').textContent=`Atualizado ${String(t.getDate()).padStart(2,'0')}/${String(t.getMonth()+1).padStart(2,'0')} às ${fmtHora(t.toISOString())} – v${VERSAO}`}
 marcaAtualizado();
