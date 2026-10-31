@@ -251,6 +251,8 @@ button.cancelarBtn{background:var(--bad);border-color:var(--bad);color:#fff;font
       <button data-ir="ent" style="--c:#5f6b73"><span class="gIc">🚚</span>Entradas</button>
       <button data-ir="est" style="--c:#2c4f7c"><span class="gIc">🛢️</span>Estoque</button>
       <button data-ir="hist" style="--c:#3d84c6"><span class="gIc">📖</span>Histórico</button>
+      <button data-ir="eq" style="--c:#1f7a4d"><span class="gIc">🚜</span>Equipamentos</button>
+      <button data-ir="op" style="--c:#8a5a12"><span class="gIc">👤</span>Operadores</button>
       <button data-ir="cad" style="--c:#11253d"><span class="gIc">⚙️</span>Configurações</button>
     </div>
   </div>
@@ -381,16 +383,16 @@ button.cancelarBtn{background:var(--bad);border-color:var(--bad);color:#fff;font
     </section>
     <div id="cadConteudo" hidden style="display:flex;flex-direction:column;gap:18px">
       <section class="panel">
-        <h2>Fazendas e equipamentos</h2>
-        <p class="note">Cada equipamento fica dentro de uma fazenda. Use ⇄ para mudar de fazenda — os abastecimentos antigos continuam registrados na fazenda onde foram feitos.</p>
+        <h2 id="cadTit">Fazendas</h2>
+        <p class="note" id="cadNota"></p>
         <div id="cadLista" style="display:flex;flex-direction:column;gap:12px"></div>
-        <div class="row"><input type="text" id="novaFaz" placeholder="Nome da nova fazenda"><button class="lima" id="addFaz" style="flex:0 0 auto">+ Fazenda</button></div>
+        <div class="row" id="cadAddFaz"><input type="text" id="novaFaz" placeholder="Nome da nova fazenda"><button class="lima" id="addFaz" style="flex:0 0 auto">+ Fazenda</button></div>
       </section>
-      <section class="panel">
+      <section class="panel" id="cadMov">
         <h2>Mudanças de fazenda</h2>
         <div id="movLista"></div>
       </section>
-      <details class="panel avancado">
+      <details class="panel avancado" id="cadAvanc">
         <summary><h2>Avançado · conexão com a nuvem</h2></summary>
         <p class="note">Endereço da planilha no Google onde ficam salvos todos os lançamentos. Já vem configurado — não precisa mexer.</p>
         <label for="apiUrl">Link do Google Script</label>
@@ -501,10 +503,10 @@ function filaFotos(id,antes,depois,tab){
 
 /* ---------- Navegação ---------- */
 let tela='inicio',cadLiberado=false;
-const TITULOS={inicio:'Abastecimentos',gest:'Gestão',abast:'Abastecer',ent:'Entradas',est:'Estoque',hist:'Histórico',cad:'Configurações'};
+const TITULOS={inicio:'Abastecimentos',gest:'Gestão',abast:'Abastecer',ent:'Entradas',est:'Estoque',hist:'Histórico',cad:'Configurações',eq:'Equipamentos',op:'Operadores'};
 function ir(t){
   tela=t;document.body.classList.toggle('naInicio',t==='inicio');
-  $('tAbast').hidden=t!=='abast';$('tGest').hidden=t!=='gest';$('tEnt').hidden=t!=='ent';$('tEst').hidden=t!=='est';$('tHist').hidden=t!=='hist';$('tCad').hidden=t!=='cad';
+  $('tAbast').hidden=t!=='abast';$('tGest').hidden=t!=='gest';$('tEnt').hidden=t!=='ent';$('tEst').hidden=t!=='est';$('tHist').hidden=t!=='hist';$('tCad').hidden=!['cad','eq','op'].includes(t);
   $('titulo').textContent=TITULOS[t];
   if(t==='inicio')cadLiberado=false;else limparTela(t);
   render();window.scrollTo(0,0);
@@ -518,7 +520,7 @@ function limparTela(t){
   if(t==='est'){fest.faz='';fest.per='30'}
 }
 /* Abastecer: sem senha. Gestão: senha 0000; dentro dela Entradas, Estoque, Histórico e Configurações */
-const DA_GESTAO=['ent','est','hist','cad'];
+const DA_GESTAO=['ent','est','hist','cad','eq','op'];
 document.querySelectorAll('[data-ir]').forEach(b=>b.onclick=async()=>{const t=b.dataset.ir;
   if(t==='abast'){ir(t);return}
   if(t==='gest'){if(await pedirSenhaTec('Senha da Gestão')){cadLiberado=true;ir('gest')}return}
@@ -545,7 +547,7 @@ $('btnVoltar').onclick=()=>ir(DA_GESTAO.includes(tela)?'gest':'inicio');
 function render(){
   if(tela==='abast')renderAbast();
   if(tela==='hist')renderHist();
-  if(tela==='cad')renderCad();
+  if(['cad','eq','op'].includes(tela))renderCad();
   if(tela==='ent')renderEnt();
   if(tela==='est')renderEst();
   statusNuvem();
@@ -1246,15 +1248,22 @@ function renderCad(){
   $('cadTrava').hidden=cadLiberado;$('cadConteudo').hidden=!cadLiberado;
   if(!cadLiberado)return;
   $('apiUrl').value=ler(K.api,'')||API_PADRAO;
+  /* cada aba mostra só o seu cadastro: Equipamentos, Operadores ou Configurações (fazendas) */
+  const modo=['eq','op'].includes(tela)?tela:'cad';
+  $('cadTit').textContent={eq:'Equipamentos por fazenda',op:'Operadores por fazenda',cad:'Fazendas'}[modo];
+  $('cadNota').textContent={eq:'Cada equipamento fica dentro de uma fazenda. Use ⇄ para mudar de fazenda — os abastecimentos antigos continuam registrados na fazenda onde foram feitos.',op:'Cada operador fica dentro de uma fazenda e aparece no Abastecer só dessa fazenda.',cad:'Cadastre aqui as fazendas. Os equipamentos e operadores ficam nas abas próprias da Gestão.'}[modo];
+  $('cadAddFaz').hidden=modo!=='cad';$('cadMov').hidden=modo!=='eq';$('cadAvanc').hidden=modo!=='cad';
   $('cadLista').innerHTML=cad.fazendas.map(f=>{
     const eqs=eqsDaFaz(f.id),ina=cad.equipamentos.filter(e=>e.fazendaId===f.id&&e.inativo);
-    return `<div class="fzBloco"><div class="fzCab"><b>${esc(f.nome)}</b><span><button class="mini" data-rf="${f.id}">✎</button> <button class="mini" data-xf="${f.id}">🗑</button></span></div>
+    if(modo==='cad')return `<div class="fzBloco"><div class="fzCab"><b>${esc(f.nome)}</b><span><button class="mini" data-rf="${f.id}">✎</button> <button class="mini" data-xf="${f.id}">🗑</button></span></div><p class="note" style="margin:0;padding:10px 14px">${eqs.length} equipamento(s) · ${(cad.operadores||[]).filter(o=>o.fazendaId===f.id&&!o.inativo).length} operador(es)</p></div>`;
+    if(modo==='op')return `<div class="fzBloco"><div class="fzCab"><b>${esc(f.nome)}</b></div>
+      ${(cad.operadores||[]).filter(o=>o.fazendaId===f.id).map(o=>`<div class="eqLinha ${o.inativo?'inativo':''}"><span>${esc(o.nome)}${o.inativo?' <span class="tag">inativo</span>':''}</span>${o.inativo?`<button class="mini" data-oat="${o.id}">▶ Reativar</button>`:`<button class="mini" data-omv="${o.id}">⇄ Mudar</button><button class="mini" data-ore="${o.id}">✎</button>${opTemLanc(o.id)?`<button class="mini inativar" data-oin="${o.id}">⏸ Inativar</button>`:`<button class="mini danger" data-oxe="${o.id}">🗑</button>`}`}</div>`).join('')||'<div class="eqLinha"><span class="note">Nenhum operador</span></div>'}
+      <div class="addLinha"><input type="text" placeholder="Novo operador" data-noi="${f.id}"><button class="lima mini" data-oae="${f.id}">+ Adicionar</button></div>`;
+    return `<div class="fzBloco"><div class="fzCab"><b>${esc(f.nome)}</b></div>
       ${eqs.map(e=>`<div class="eqLinha"><span>${esc(e.nome)}</span><button class="mini" data-mv="${e.id}" title="Mudar de fazenda">⇄ Mudar</button><button class="mini" data-re="${e.id}">✎</button>${temLanc(e.id)?`<button class="mini inativar" data-in="${e.id}">⏸ Inativar</button>`:`<button class="mini danger" data-xe="${e.id}">🗑</button>`}</div>`).join('')||'<div class="eqLinha"><span class="note">Nenhum equipamento ativo</span></div>'}
       ${ina.map(e=>`<div class="eqLinha inativo"><span>${esc(e.nome)} <span class="tag">inativo</span></span><button class="mini" data-at="${e.id}">▶ Reativar</button></div>`).join('')}
       <div class="addLinha"><input type="text" placeholder="Novo equipamento" data-ni="${f.id}"><button class="lima mini" data-ae="${f.id}">+ Adicionar</button></div>
-      <div class="subTit">👤 Operadores</div>
-      ${(cad.operadores||[]).filter(o=>o.fazendaId===f.id).map(o=>`<div class="eqLinha ${o.inativo?'inativo':''}"><span>${esc(o.nome)}${o.inativo?' <span class="tag">inativo</span>':''}</span>${o.inativo?`<button class="mini" data-oat="${o.id}">▶ Reativar</button>`:`<button class="mini" data-omv="${o.id}">⇄ Mudar</button><button class="mini" data-ore="${o.id}">✎</button>${opTemLanc(o.id)?`<button class="mini inativar" data-oin="${o.id}">⏸ Inativar</button>`:`<button class="mini danger" data-oxe="${o.id}">🗑</button>`}`}</div>`).join('')||'<div class="eqLinha"><span class="note">Nenhum operador</span></div>'}
-      <div class="addLinha"><input type="text" placeholder="Novo operador" data-noi="${f.id}"><button class="lima mini" data-oae="${f.id}">+ Adicionar</button></div></div>`}).join('')||'<div class="vazio">Nenhuma fazenda cadastrada.</div>';
+</div>`}).join('')||'<div class="vazio">Nenhuma fazenda cadastrada.</div>';
   const L=$('cadLista');
   // operadores
   L.querySelectorAll('[data-oae]').forEach(b=>b.onclick=()=>{const i=L.querySelector(`[data-noi="${b.dataset.oae}"]`);const n=i.value.trim();if(!n){i.focus();return}
@@ -1361,12 +1370,27 @@ async function carregar(){
   }catch(e){online=false}
   $('btnAtualizar').classList.remove('girando');render();
 }
-$('btnAtualizar').onclick=carregar;
+$('btnAtualizar').onclick=()=>{checarVersao(true);carregar()};
+/* Atualiza o app sozinho: confere a versão publicada ao abrir, ao voltar para o app e no ⟳ */
+async function checarVersao(forcar){
+  try{
+    const v=String((await (await fetch('versao.json?t='+Date.now(),{cache:'no-store'})).json()).versao||'');
+    if(!v||v===VERSAO)return;
+    let tentou='';try{tentou=sessionStorage.getItem('ab_tentou')||''}catch(e){}
+    if(tentou===v&&!forcar)return; // já tentou esta versão: não fica recarregando
+    try{sessionStorage.setItem('ab_tentou',v)}catch(e){}
+    if(pend.length||!$('tecSenha').hidden||document.querySelector('.fundo,.cam'))return; // não atrapalha quem está lançando
+    try{const r=navigator.serviceWorker&&await navigator.serviceWorker.getRegistration();if(r)await r.update()}catch(e){}
+    toast('Atualizando o app…');setTimeout(()=>location.reload(),600);
+  }catch(e){}
+}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checarVersao()});
+window.addEventListener('pageshow',()=>checarVersao());
 window.addEventListener('online',carregar);
 setInterval(()=>{if(document.visibilityState==='visible')carregar()},60000);
 
 /* ---------- Início ---------- */
-const VERSAO='11';
+const VERSAO='12';
 function marcaAtualizado(d){if(d)gravar('ab_sync',d);const x=ler('ab_sync',null);const t=x?new Date(x):new Date();
   $('hoje').textContent=`Atualizado ${String(t.getDate()).padStart(2,'0')}/${String(t.getMonth()+1).padStart(2,'0')} às ${fmtHora(t.toISOString())} – v${VERSAO}`}
 marcaAtualizado();
