@@ -71,7 +71,7 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .inicio{display:none;flex-direction:column;gap:14px;padding-top:10px}
 body.naInicio .inicio{display:flex}
 button.grande{font-size:1.9rem;padding:24px 14px;border-radius:16px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:12px;border:0}
-button.gAbast{background:var(--verde);border-color:var(--verde);color:#fff}
+button.gAbast{background:#3d9ad6;border-color:#3d9ad6;color:#fff}
 button.gHist{background:#3d84c6;border-color:#3d84c6;color:#fff}
 button.gCad{background:#11253d;border-color:#11253d;color:#fff}
 button.gEnt{background:#5f6b73;border-color:#5f6b73;color:#fff}
@@ -252,11 +252,11 @@ button.cancelarBtn{background:var(--bad);border-color:var(--bad);color:#fff;font
   <!-- GESTÃO (senha 0000) -->
   <div id="tGest" hidden>
     <div class="gTiles">
-      <button data-ir="ent" style="--c:#5f6b73"><span class="gIc">🚚</span>Entradas</button>
+      <button data-ir="ent" style="--c:#1f7a4d"><span class="gIc">🚚</span>Entradas</button>
       <button data-ir="sai" style="--c:#9a3b2c"><span class="gIc">📤</span>Saídas</button>
       <button data-ir="est" style="--c:#2c4f7c"><span class="gIc">🛢️</span>Estoque</button>
       <button data-ir="hist" style="--c:#3d84c6"><span class="gIc">📖</span>Histórico</button>
-      <button data-ir="eq" style="--c:#1f7a4d"><span class="gIc">🚜</span>Equipamentos</button>
+      <button data-ir="eq" style="--c:#5f6b73"><span class="gIc">🚜</span>Equipamentos</button>
       <button data-ir="op" style="--c:#8a5a12"><span class="gIc">👤</span>Operadores</button>
       <button data-ir="cad" style="--c:#11253d"><span class="gIc">⚙️</span>Configurações</button>
     </div>
@@ -288,6 +288,7 @@ button.cancelarBtn{background:var(--bad);border-color:var(--bad);color:#fff;font
       <div class="passo" id="abEqBox" hidden>
         <label>Equipamento</label>
         <div class="escolha eq" id="abEq"></div>
+        <div id="abOutroBox" hidden><label for="abOutro" style="margin-top:6px">Qual equipamento? <span class="obrig">*</span></label><input type="text" id="abOutro" placeholder="Escreva o equipamento" autocomplete="off"></div>
       </div>
       <div class="passo" id="abLtBox" hidden>
         <label style="margin-top:2px">Fotos do marcador da bomba</label>
@@ -558,9 +559,13 @@ function limparTela(t){
 const DA_GESTAO=['ent','sai','est','hist','cad','eq','op'];
 document.querySelectorAll('[data-ir]').forEach(b=>b.onclick=async()=>{const t=b.dataset.ir;
   if(t==='abast'){ir(t);return}
-  if(t==='gest'){if(await pedirSenhaTec('Senha da Gestão')){cadLiberado=true;ir('gest')}return}
+  if(t==='gest'){if(gestaoLiberada()||await pedirSenhaTec('Senha da Gestão')){liberaGestao();ir('gest')}return}
   if(DA_GESTAO.includes(t)&&cadLiberado){ir(t);return}
-  if(await pedirSenhaTec('Senha da Gestão')){cadLiberado=true;ir(t)}});
+  if(gestaoLiberada()||await pedirSenhaTec('Senha da Gestão')){liberaGestao();ir(t)}});
+/* senha da Gestão: neste aparelho pede uma vez pela manhã e uma vez à tarde */
+const periodo=()=>chaveDia()+(new Date().getHours()<12?'M':'T');
+function gestaoLiberada(){try{return localStorage.getItem('ab_gestOk')===periodo()}catch(e){return false}}
+function liberaGestao(){cadLiberado=true;try{localStorage.setItem('ab_gestOk',periodo())}catch(e){}}
 /* Teclado de senha: abre ao tocar no menu; com 4 dígitos certos já entra */
 let senhaDig='',senhaRes=null;
 function mostrarSenha(){$('senhaValor').textContent='●'.repeat(senhaDig.length)+'○'.repeat(Math.max(0,SENHA.length-senhaDig.length))}
@@ -602,16 +607,20 @@ function renderAbast(){
   const ops=form.faz?opsDaFaz(form.faz):[];
   $('abOpBox').hidden=!form.faz;
   if(form.faz){
-    $('abOp').innerHTML=ops.map(o=>`<button data-o="${o.id}" class="${form.op===o.id?'sel':''}">${esc(o.nome)}</button>`).join('')||'<div class="vazio" style="grid-column:1/-1">Nenhum operador nesta fazenda. Cadastre em Gestão › Configurações.</div>';
+    $('abOp').innerHTML=ops.map(o=>`<button data-o="${o.id}" class="${form.op===o.id?'sel':''}">${esc(o.nome)}</button>`).join('')||'<div class="vazio" style="grid-column:1/-1">Nenhum operador nesta fazenda. Cadastre em Gestão › Operadores.</div>';
     $('abOp').querySelectorAll('button').forEach(b=>b.onclick=()=>{form.op=b.dataset.o;renderAbast()});
   }
   const opOk=form.faz&&(form.op||!ops.length);
   $('abEqBox').hidden=!opOk;
   if(opOk){
     const lista=eqsDaFaz(form.faz);
-    $('abEq').innerHTML=lista.map(e=>`<button data-e="${e.id}" class="${form.eq===e.id?'sel':''}">${esc(e.nome)}</button>`).join('')||'<div class="vazio" style="grid-column:1/-1">Nenhum equipamento nesta fazenda. Cadastre em ⚙️ Configurações.</div>';
-    $('abEq').querySelectorAll('button').forEach(b=>b.onclick=()=>{form.eq=b.dataset.e;renderAbast();setTimeout(()=>$('abLtBox').scrollIntoView({behavior:'smooth',block:'start'}),50)});
+    const idO='outro:'+form.faz; // OUTRO: equipamento não cadastrado, escrito na hora
+    $('abEq').innerHTML=lista.map(e=>`<button data-e="${e.id}" class="${form.eq===e.id?'sel':''}">${esc(e.nome)}</button>`).join('')+`<button data-e="${idO}" class="${form.eq===idO?'sel':''}">OUTRO</button>`;
+    $('abEq').querySelectorAll('button').forEach(b=>b.onclick=()=>{const era=form.eq;form.eq=b.dataset.e;renderAbast();
+      if(form.eq===idO){if(era!==idO)$('abOutro').value='';setTimeout(()=>{$('abOutroBox').scrollIntoView({behavior:'smooth',block:'center'});$('abOutro').focus()},50)}
+      else setTimeout(()=>$('abLtBox').scrollIntoView({behavior:'smooth',block:'start'}),50)});
   }
+  $('abOutroBox').hidden=!(form.eq&&String(form.eq).startsWith('outro:'));
   $('abLtBox').hidden=!form.eq;$('abCancelar').hidden=!form.faz;
   $('abEstoque').hidden=!form.faz;if(form.faz){const sd=saldoFaz(form.faz);$('abEstoque').innerHTML=`<small>Estoque atual</small><b class="${sd<0?'neg':''}">${fmtL(sd)} L</b>`}
   if(form.eq){slotsFotos($('abFotos'),form.fotos,renderAbast);
@@ -624,7 +633,8 @@ $('abHoje').onclick=()=>{form.data=chaveDia();renderAbast()};
 $('abRegistrar').onclick=()=>{
   const lt=parseInt(String($('abLitros').value).replace(/\D/g,''),10);
   if(!(lt>0)){toast('Informe os litros');$('abLitros').focus();return}
-  const f=fazPorId(form.faz),e=eqPorId(form.eq);
+  const f=fazPorId(form.faz);let e=eqPorId(form.eq);
+  if(String(form.eq).startsWith('outro:')){const qual=$('abOutro').value.trim();if(!qual){toast('Escreva qual equipamento');$('abOutro').focus();return}e={id:form.eq,nome:'OUTRO - '+qual}}
   const op=form.op?opPorId(form.op):null;
   const rec={id:uid(),data:form.data,fazendaId:f.id,fazenda:f.nome,equipId:e.id,equipamento:e.nome,operadorId:op?op.id:'',operador:op?op.nome:'',litros:lt,obs:$('abObs').value.trim(),registradoEm:new Date().toISOString(),aparelho:disp,fotos:[null,null,null,null]};
   const fts=form.fotos.slice();rec.fotos=fts.map(f=>f?{k:f.k,arq:null}:null);
@@ -825,10 +835,10 @@ function renderHist(){
   let eqs=[];
   if(filtro.faz){
     eqsDaFaz(filtro.faz).forEach(e=>eqs.push({id:e.id,nome:e.nome,obs:''}));
-    abs.filter(a=>a.fazendaId===filtro.faz).forEach(a=>{if(!eqs.find(e=>e.id===a.equipId)){const at=eqPorId(a.equipId);eqs.push({id:a.equipId,nome:a.equipamento,obs:at&&fazPorId(at.fazendaId)?' (hoje em '+fazPorId(at.fazendaId).nome+')':''})}});
+    abs.filter(a=>a.fazendaId===filtro.faz).forEach(a=>{if(!eqs.find(e=>e.id===a.equipId)){const at=eqPorId(a.equipId);eqs.push({id:a.equipId,nome:String(a.equipId).startsWith('outro:')?'OUTRO':a.equipamento,obs:at&&fazPorId(at.fazendaId)?' (hoje em '+fazPorId(at.fazendaId).nome+')':''})}});
   }else{
     cad.equipamentos.filter(e=>!e.inativo).forEach(e=>eqs.push({id:e.id,nome:e.nome,obs:fazPorId(e.fazendaId)?' — '+fazPorId(e.fazendaId).nome:''}));
-    abs.forEach(a=>{if(!eqs.find(e=>e.id===a.equipId))eqs.push({id:a.equipId,nome:a.equipamento,obs:''})});
+    abs.forEach(a=>{if(!eqs.find(e=>e.id===a.equipId))eqs.push({id:a.equipId,nome:String(a.equipId).startsWith('outro:')?'OUTRO':a.equipamento,obs:String(a.equipId).startsWith('outro:')?a.fazenda:''})});
   }
   eqsVisiveis=eqs;
   $('hEq').innerHTML=eqs.map(e=>`<label class="eqChk ${filtro.off.has(e.id)?'':'on'}"><input type="checkbox" data-eq="${e.id}" ${filtro.off.has(e.id)?'':'checked'}><span>${esc(e.nome)}${e.obs?`<small>${esc(e.obs.replace(/^ — /,''))}</small>`:''}</span></label>`).join('')||'<div class="vazio">Nenhum equipamento.</div>';
@@ -1252,7 +1262,7 @@ function gerarXlsx(l){
   l.forEach(a=>{const h=hSer(a.registradoEm),q=qtdFotos(a);r1.push([{v:dSer(a.data),s:2},h===''?{v:''}:{v:h,s:3},{v:a.fazenda},{v:a.equipamento},{v:a.operador||''},{v:Number(a.litros)||0,s:4},{v:a.obs||''},{v:q?q+(q>1?' fotos':' foto'):''}])});
   r1.push([T('TOTAL'),T(''),T(''),T(l.length+' abastecimentos'),T(''),{f:`SUM(F2:F${l.length+1})`,v:tot,s:5},T(''),T('')]);
   // Aba 2: por equipamento (na fazenda onde abasteceu)
-  const m=new Map();l.forEach(a=>{const k=a.fazendaId+'|'+a.equipId;if(!m.has(k))m.set(k,{f:a.fazenda,e:a.equipamento,n:0,lt:0});const o=m.get(k);o.n++;o.lt+=Number(a.litros||0)});
+  const m=new Map();l.forEach(a=>{const k=a.fazendaId+'|'+(String(a.equipId).startsWith('outro:')?a.equipamento:a.equipId);if(!m.has(k))m.set(k,{f:a.fazenda,e:a.equipamento,n:0,lt:0});const o=m.get(k);o.n++;o.lt+=Number(a.litros||0)});
   const eqs=[...m.values()].sort((a,b)=>String(a.f).localeCompare(b.f)||String(a.e).localeCompare(b.e,'pt-BR',{numeric:true}));
   const r2=[[H('Fazenda'),H('Equipamento'),H('Abastecimentos'),H('Litros'),H('Média (L)')]];
   eqs.forEach((o,i)=>{const n=i+2;r2.push([{v:o.f},{v:o.e},{v:o.n,s:7},{v:o.lt,s:4},{f:`IF(C${n}=0,0,D${n}/C${n})`,v:o.n?o.lt/o.n:0,s:4}])});
@@ -1480,7 +1490,7 @@ window.addEventListener('online',carregar);
 setInterval(()=>{if(document.visibilityState==='visible')carregar()},60000);
 
 /* ---------- Início ---------- */
-const VERSAO='15';
+const VERSAO='16';
 function marcaAtualizado(d){if(d)gravar('ab_sync',d);const x=ler('ab_sync',null);const t=x?new Date(x):new Date();
   $('hoje').textContent=`Atualizado ${String(t.getDate()).padStart(2,'0')}/${String(t.getMonth()+1).padStart(2,'0')} às ${fmtHora(t.toISOString())} – v${VERSAO}`}
 marcaAtualizado();
