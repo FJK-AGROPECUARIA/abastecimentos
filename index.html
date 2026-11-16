@@ -470,7 +470,8 @@ button.cancelarBtn{background:var(--bad);border-color:var(--bad);color:#fff;font
 'use strict';
 const SENHA='0000';
 const PRAZO=5*60*1000; // tempo para quem lançou editar em Abastecimentos recentes
-const API_PADRAO='https://script.google.com/macros/s/AKfycbx66H8nZYawnnB012mpXb8isdQxzXyv45jz1L3glKxg30bH8VYJiHOIQYuPFzzeGQ4k/exec'; // será preenchido quando criarmos o projeto "Abastecimentos FJK" no Google
+const API_PADRAO='https://script.google.com/macros/s/AKfycbzDYyVFkap4VCzVkTybfL0Lo_NgxkOHy6MKI7XNy0-GremDxwuD-KDn0FJFys4Y5GK8/exec';
+const API_ANTIGO='https://script.google.com/macros/s/AKfycbx66H8nZYawnnB012mpXb8isdQxzXyv45jz1L3glKxg30bH8VYJiHOIQYuPFzzeGQ4k/exec';   // link antigo (projeto preso à planilha): quem tinha salvo passa a usar o novo
 const K={cad:'ab_cad',abs:'ab_abs',pend:'ab_pend',fila:'ab_fila',api:'ab_api',disp:'ab_disp',ents:'ab_ents',pendE:'ab_pendE'};
 
 const $=id=>document.getElementById(id);
@@ -492,7 +493,7 @@ let pend=ler(K.pend,[]); // ids lançados neste aparelho nos últimos 5 min
 let fila=ler(K.fila,[]); // envios aguardando internet
 let ents=ler(K.ents,[]); // entradas de combustível (notas)
 let pendE=ler(K.pendE,[]); // entradas lançadas neste aparelho nos últimos 5 min
-const apiUrl=()=>ler(K.api,'')||API_PADRAO;
+const apiUrl=()=>{const u=ler(K.api,'');return (u&&u!==API_ANTIGO)?u:API_PADRAO;};
 
 // Fazendas iniciais (os equipamentos são cadastrados em Cadastros)
 if(!cad){
@@ -1411,7 +1412,7 @@ function salvarCad(msg){
 function renderCad(){
   $('cadTrava').hidden=cadLiberado;$('cadConteudo').hidden=!cadLiberado;
   if(!cadLiberado)return;
-  $('apiUrl').value=ler(K.api,'')||API_PADRAO;
+  $('apiUrl').value=apiUrl();
   /* cada aba mostra só o seu cadastro: Equipamentos, Operadores ou Configurações (fazendas) */
   const modo=['eq','op'].includes(tela)?tela:'cad';
   $('cadTit').textContent={eq:'Equipamentos por fazenda',op:'Operadores por fazenda',cad:'Fazendas'}[modo];
@@ -1570,7 +1571,7 @@ window.addEventListener('online',carregar);
 setInterval(()=>{if(document.visibilityState==='visible')carregar()},60000);
 
 /* ---------- Início ---------- */
-const VERSAO='20';
+const VERSAO='21';
 function marcaAtualizado(d){if(d)gravar('ab_sync',d);const x=ler('ab_sync',null);const t=x?new Date(x):new Date();
   $('hoje').textContent=`Atualizado ${String(t.getDate()).padStart(2,'0')}/${String(t.getMonth()+1).padStart(2,'0')} às ${fmtHora(t.toISOString())} – v${VERSAO}`}
 marcaAtualizado();
