@@ -442,6 +442,11 @@ button.cancelarBtn{background:var(--bad);border-color:var(--bad);color:#fff;font
         <h2>Mudanças de fazenda</h2>
         <div id="movLista"></div>
       </section>
+      <section class="panel" id="cadBackup">
+        <h2>Backup</h2>
+        <p class="note">Salva o banco de dados e os códigos do sistema na pasta <b>FJK - GESTAO DE ABASTECIMENTOS</b> do Google Drive. O automático é feito todo dia às 2h. Ficam guardados os 20 mais recentes de cada (manual e automático).</p>
+        <button class="lima" id="btnBackup">Fazer backup agora</button>
+      </section>
       <details class="panel avancado" id="cadAvanc">
         <summary><h2>Avançado · conexão com a nuvem</h2></summary>
         <p class="note">Endereço da planilha no Google onde ficam salvos todos os lançamentos. Já vem configurado — não precisa mexer.</p>
@@ -1417,7 +1422,7 @@ function renderCad(){
   const modo=['eq','op'].includes(tela)?tela:'cad';
   $('cadTit').textContent={eq:'Equipamentos por fazenda',op:'Operadores por fazenda',cad:'Fazendas'}[modo];
   $('cadNota').textContent={eq:'Cada equipamento fica dentro de uma fazenda. Use ⇄ para mudar de fazenda — os abastecimentos antigos continuam registrados na fazenda onde foram feitos.',op:'Cada operador fica dentro de uma fazenda e aparece no Abastecer só dessa fazenda.',cad:'Cadastre aqui as fazendas. Os equipamentos e operadores ficam nas abas próprias da Gestão.'}[modo];
-  $('cadAddFaz').hidden=modo!=='cad';$('cadMov').hidden=modo!=='eq';$('cadAvanc').hidden=modo!=='cad';
+  $('cadAddFaz').hidden=modo!=='cad';$('cadMov').hidden=modo!=='eq';$('cadAvanc').hidden=modo!=='cad';$('cadBackup').hidden=modo!=='cad';
   $('cadTit').parentNode.hidden=modo==='cad';if(modo==='cad')$('cadAvanc').open=true; // Configurações: só a conexão com a nuvem
   $('cadLista').innerHTML=cad.fazendas.map(f=>{
     const eqs=eqsDaFaz(f.id),ina=cad.equipamentos.filter(e=>e.fazendaId===f.id&&e.inativo);
@@ -1499,6 +1504,15 @@ $('salvarApi').onclick=()=>{const v=$('apiUrl').value.trim();
   if(v&&!/^https:\/\/script\.google\.com\/.+\/exec$/.test(v)){toast('O link precisa começar com https://script.google.com e terminar em /exec');return}
   gravar(K.api,v);toast(v?'Link salvo':'Link removido');carregar()};
 
+/* ---------- Backup manual (banco de dados + códigos) ---------- */
+$('btnBackup').onclick=async()=>{const bt=$('btnBackup');
+  if(!navigator.onLine){toast('Sem internet. Tente de novo quando tiver sinal.');return}
+  bt.disabled=true;bt.textContent='Fazendo backup… (pode levar 1 minuto)';
+  try{const j=await (await fetch(apiUrl(),{method:'POST',body:JSON.stringify({acao:'backup'})})).json();
+    toast(j&&j.ok?'Backup feito: banco de dados e códigos':'Backup com problema: '+((j&&(j.erroBanco||j.erroCodigo||j.erro))||'erro'));
+  }catch(e){toast('Não consegui fazer o backup: '+(e.message||e))}
+  bt.disabled=false;bt.textContent='Fazer backup agora'};
+
 /* ---------- Nuvem (Google Script) ---------- */
 let enviando=false,online=null;
 function statusNuvem(){
@@ -1571,7 +1585,7 @@ window.addEventListener('online',carregar);
 setInterval(()=>{if(document.visibilityState==='visible')carregar()},60000);
 
 /* ---------- Início ---------- */
-const VERSAO='21';
+const VERSAO='22';
 function marcaAtualizado(d){if(d)gravar('ab_sync',d);const x=ler('ab_sync',null);const t=x?new Date(x):new Date();
   $('hoje').textContent=`Atualizado ${String(t.getDate()).padStart(2,'0')}/${String(t.getMonth()+1).padStart(2,'0')} às ${fmtHora(t.toISOString())} – v${VERSAO}`}
 marcaAtualizado();
